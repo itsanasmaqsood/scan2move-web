@@ -289,7 +289,7 @@
 
   var $ = function(id){ return document.getElementById(id); };
   var token = null, reason = null, jwt = null, refreshToken = null,
-      scanId = null, pollTimer = null;
+      scanId = null, pollTimer = null, isLost = false;
   var SESSION_KEY = "scan2move_scanner_session_v1";
 
   function readStored(key){
@@ -401,6 +401,7 @@
       // ordinary "is it blocking you?" form, which is the wrong question and
       // wastes the one moment that matters to the owner.
       if (row.tag_status === "lost") {
+        isLost = true;
         $("lostNote").hidden = false;
         $("reasons").hidden = true;
         $("reasonLabel").hidden = true;
@@ -408,7 +409,9 @@
           "For example: I found this vehicle parked on Church Street. It looks undamaged.";
         $("send").textContent = "Tell the owner where it is";
         $("sendHint").textContent = "Anything you can say about where it is will help.";
-        reason = "found";
+        // Keep compatibility with the current backend while migration 0012,
+        // which adds a dedicated "found" code, is being rolled out.
+        reason = "other";
         refreshSend();
       }
 
@@ -443,13 +446,13 @@
   });
 
   function defaultBody(){
+    if (isLost) return "I have found your vehicle — I am telling you where it is.";
     return ({
       blocking: "Your vehicle is blocking the way, please move it when you can.",
       lights_on:    "Your vehicle's lights have been left on.",
       window_open:  "A window or door on your vehicle looks open.",
       parked_badly: "Someone needs help with parking near your vehicle.",
-      damage:   "Your vehicle may have been damaged — please come and check.",
-          found:    "I have found your vehicle — I am telling you where it is."
+      damage:   "Your vehicle may have been damaged — please come and check."
     })[reason] || "Someone needs you at your vehicle.";
   }
 

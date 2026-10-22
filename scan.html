@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Scan To Move</title>
+<!--
+  The stranger-facing scan page.
+
+  This is the single most important screen in the product and the only one a
+  non-customer ever sees. It is deliberately one file with no build step, no
+  framework and no external request except to the project's own API, so it can
+  be dropped into the public storage bucket the owner already controls and
+  served for free. The previous developer's website is not required for any of
+  it.
+
+  The rule that shapes every line below: **the scanner never learns who the
+  owner is.** No name, no phone number, no plate, no WhatsApp link, no call
+  button. `resolve_tag` on the server returns only a vehicle label and a status;
+  the owner's identity is never sent to this page, so it cannot leak from it
+  even by accident. That is the opposite of what the old website does, and it is
+  the entire product.
+
+  The scanner is signed in anonymously before anything is sent. That costs
+  nothing, and it is what lets them read the owner's reply afterwards: the
+  thread is scoped to the scan's scanner_id, so without an identity the
+  conversation would be one-way and the stranger would never know they had been
+  answered.
+-->
+<style>
+  :root{
+    --canvas:#F6F8FC; --ink:#0F1729; --ink-muted:#5A6478; --ink-faint:#9AA3B4;
+    --mint:#00C48C; --mint-deep:#00996E; --mint-soft:#D6F8EC;
+    --iris:#5B5BD6; --iris-soft:#E6E4FF;
+    --coral:#FF6B5A; --coral-soft:#FFE2DE;
+    --surface:rgba(255,255,255,.82); --line:rgba(15,23,41,.08);
+    --radius:22px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--canvas); color:var(--ink);
+    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    min-height:100dvh; display:flex; flex-direction:column; align-items:center;
+    padding:24px 16px 40px; position:relative; overflow-x:hidden;
+  }
+  /* The same living canvas as the app, so the two feel like one product. */
+  .aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+  .blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
+  .b1{width:300px;height:300px;background:#7FF3C8;top:-90px;left:-70px}
+  .b2{width:280px;height:280px;background:#B9A8FF;top:18%;right:-110px;opacity:.5}
+  .b3{width:260px;height:260px;background:#9BD9FF;bottom:16%;left:-90px;opacity:.42}
+  .b4{width:240px;height:240px;background:#FFC9A8;bottom:-70px;right:-60px;opacity:.4}
+  @media (prefers-reduced-motion:no-preference){
+    .b1{animation:d1 26s ease-in-out infinite}
+    .b2{animation:d2 31s ease-in-out infinite}
+    .b3{animation:d1 36s ease-in-out infinite reverse}
+  }
+  @keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,18px)}}
+  @keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-22px,24px)}}
+
+  .wrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:4px}
+  .brand svg{display:block}
+  .brand b{font-size:17px;font-weight:700;letter-spacing:-.01em}
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    box-shadow:0 10px 30px rgba(15,23,41,.06);
+  }
+  h1{font-size:26px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em}
+  .sub{color:var(--ink-muted);margin:0;font-size:15px}
+
+  .vehicle{display:flex;align-items:center;gap:14px;margin-top:4px}
+  .vicon{
+    width:52px;height:52px;border-radius:16px;background:var(--mint-soft);
+    display:grid;place-items:center;flex:0 0 auto
+  }
+  .vname{font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .vtype{color:var(--ink-muted);font-size:14px;text-transform:capitalize}
+
+  .promise{
+    display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:13px 14px;
+    background:var(--mint-soft);border-radius:14px;color:#00563E;font-size:13.5px;line-height:1.45
+  }
+  .promise svg{flex:0 0 auto;margin-top:1px}
+
+  .label{font-size:13px;font-weight:700;color:var(--ink-muted);margin:4px 0 10px;letter-spacing:.01em}
+  .reasons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .reason{
+    display:flex;flex-direction:column;align-items:flex-start;gap:7px;
+    padding:14px 13px;border-radius:16px;border:1.5px solid var(--line);
+    background:rgba(255,255,255,.7);cursor:pointer;text-align:left;
+    font:inherit;font-size:14px;font-weight:600;color:var(--ink);
+    transition:border-color .15s,background .15s,transform .1s
+  }
+  .reason .emo{font-size:21px;line-height:1}
+  .reason:active{transform:scale(.98)}
+  .reason[aria-pressed="true"]{border-color:var(--mint);background:var(--mint-soft)}
+
+  textarea{
+    width:100%;min-height:92px;resize:vertical;padding:13px 14px;border-radius:14px;
+    border:1.5px solid var(--line);background:rgba(255,255,255,.75);
+    font:inherit;font-size:15px;color:var(--ink)
+  }
+  textarea:focus{outline:none;border-color:var(--mint)}
+  .count{font-size:12px;color:var(--ink-faint);text-align:right;margin-top:6px}
+
+  button.primary{
+    width:100%;padding:17px;border:0;border-radius:999px;background:var(--mint);
+    color:#002014;font:inherit;font-size:16.5px;font-weight:700;cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,196,140,.3);transition:transform .1s,opacity .15s
+  }
+  button.primary:active{transform:scale(.985)}
+  button.primary:disabled{opacity:.5;cursor:default;box-shadow:none}
+  button.ghost{
+    width:100%;padding:14px;border:1.5px solid var(--line);border-radius:999px;
+    background:transparent;font:inherit;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer
+  }
+
+  .err{background:var(--coral-soft);color:#8A2317;padding:13px 14px;border-radius:14px;font-size:14.5px}
+  .lost{display:flex;gap:10px;align-items:flex-start;padding:14px;border-radius:14px;background:var(--coral-soft);color:#8A2317;font-size:14px;line-height:1.5;margin-bottom:18px}
+  .lost svg{flex:0 0 auto;margin-top:2px}
+  .lost b{display:block;margin-bottom:3px}
+  .center{text-align:center}
+  .muted{color:var(--ink-muted);font-size:14px}
+  .foot{color:var(--ink-faint);font-size:12px;text-align:center;margin-top:6px}
+  [hidden]{display:none !important}
+
+  /* Sent confirmation: rings leaving the tick, the same idea as the app splash. */
+  .done{display:grid;place-items:center;padding:12px 0 4px}
+  .ring{
+    position:absolute;border:2px solid var(--mint);border-radius:50%;
+    width:74px;height:74px;opacity:0
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .ring{animation:pulse 2.6s ease-out infinite}
+    .ring:nth-child(2){animation-delay:.6s}
+    .ring:nth-child(3){animation-delay:1.2s}
+  }
+  @keyframes pulse{0%{transform:scale(.8);opacity:.75}100%{transform:scale(2.5);opacity:0}}
+  .tick{
+    position:relative;width:74px;height:74px;border-radius:50%;background:var(--mint);
+    display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,196,140,.35)
+  }
+  .ringwrap{position:relative;display:grid;place-items:center;height:110px}
+
+  .thread{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+  .msg{padding:12px 14px;border-radius:16px;font-size:15px;max-width:86%;line-height:1.45}
+  .mine{background:var(--iris-soft);align-self:flex-end;border-bottom-right-radius:6px}
+  .theirs{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:6px}
+  .who{font-size:11.5px;font-weight:700;color:var(--ink-faint);margin-bottom:3px;letter-spacing:.02em}
+</style>
+</head>
+<body>
+
+<div class="aurora">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="blob b3"></div><div class="blob b4"></div>
+</div>
+
+<div class="wrap">
+
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2" y="2" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
+      <rect x="14" y="2" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
+      <rect x="2" y="14" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
+      <rect x="15.5" y="15.5" width="5" height="5" rx="1.6" fill="#00C48C"/>
+    </svg>
+    <b>Scan To Move</b>
+  </div>
+
+  <!-- Loading -->
+  <div class="card center" id="loading">
+    <p class="muted" style="margin:6px 0">Checking this code…</p>
+  </div>
+
+  <!-- Could not resolve -->
+  <div class="card" id="bad" hidden>
+    <h1>This code isn't active</h1>
+    <p class="sub" id="badWhy">It may have been paused by the owner, replaced, or it isn't a Scan To Move code.</p>
+    <p class="sub" style="margin-top:14px">If the vehicle is causing a problem, please contact building security or local authorities.</p>
+  </div>
+
+  <!-- Compose -->
+  <div id="compose" hidden>
+    <div class="card">
+      <div class="vehicle">
+        <div class="vicon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M5 11l1.5-4.2A2 2 0 018.4 5.5h7.2a2 2 0 011.9 1.3L19 11m-14 0h14m-14 0v5.5m14-5.5v5.5M6.5 16.5h11M6.5 16.5v1.6a.9.9 0 01-.9.9H5a.9.9 0 01-.9-.9V16.5m13.4 0v1.6a.9.9 0 00.9.9h.6a.9.9 0 00.9-.9V16.5"
+              stroke="#00996E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="7.6" cy="13.6" r="1" fill="#00996E"/><circle cx="16.4" cy="13.6" r="1" fill="#00996E"/>
+          </svg>
+        </div>
+        <div>
+          <div class="vname" id="vname">This vehicle</div>
+          <div class="vtype" id="vtype"></div>
+        </div>
+      </div>
+
+      <div class="promise">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3l7 3v5.5c0 4.3-3 7.6-7 9-4-1.4-7-4.7-7-9V6l7-3z" stroke="#00563E" stroke-width="1.8" stroke-linejoin="round"/>
+          <circle cx="9" cy="12" r="1" fill="#00563E"/><circle cx="12" cy="12" r="1" fill="#00563E"/><circle cx="15" cy="12" r="1" fill="#00563E"/>
+        </svg>
+        <div><b>Nobody's number is shown here.</b> You won't see the owner's phone number, and they won't see yours. Your message reaches them straight away.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <!-- Shown only when the owner has reported this vehicle lost or stolen.
+           It replaces the reason buttons: "is it blocking you?" is the wrong
+           question when someone has just found a missing vehicle. -->
+      <div class="lost" id="lostNote" hidden>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3l7 3v5.5c0 4.3-3 7.6-7 9-4-1.4-7-4.7-7-9V6l7-3z" stroke="#8A2317" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M12 8.5v4" stroke="#8A2317" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="15.6" r="1.1" fill="#8A2317"/>
+        </svg>
+        <div>
+          <b>This vehicle is reported lost or stolen.</b>
+          If you have found it, telling the owner where it is will help enormously.
+          If you believe it was stolen, please also contact the local police.
+        </div>
+      </div>
+
+      <div class="label" id="reasonLabel">WHY ARE YOU CONTACTING THEM?</div>
+      <div class="reasons" id="reasons">
+        <button class="reason" data-r="blocking"  aria-pressed="false"><span class="emo">🚗</span>Blocking my way</button>
+        <button class="reason" data-r="lights_on"    aria-pressed="false"><span class="emo">💡</span>Lights are on</button>
+        <button class="reason" data-r="window_open"  aria-pressed="false"><span class="emo">🚪</span>Window or door open</button>
+        <button class="reason" data-r="parked_badly" aria-pressed="false"><span class="emo">📢</span>Parking help</button>
+        <button class="reason" data-r="damage"    aria-pressed="false"><span class="emo">⚠️</span>Possible damage</button>
+        <button class="reason" data-r="other"     aria-pressed="false"><span class="emo">💬</span>Something else</button>
+      </div>
+
+      <div class="label" style="margin-top:20px">MESSAGE</div>
+      <textarea id="body" maxlength="1000" placeholder="For example: your car is blocking the gate on the north side, please come when you can."></textarea>
+      <div class="count"><span id="count">0</span>/1000</div>
+
+      <button class="primary" id="send" style="margin-top:8px" disabled>Send to the owner</button>
+      <p class="foot" id="sendHint">Choose a reason, or just write a message.</p>
+    </div>
+  </div>
+
+  <!-- Sent -->
+  <div id="sent" hidden>
+    <div class="card center">
+      <div class="ringwrap">
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+        <div class="tick">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#002014" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <h1 style="margin-top:4px">The owner has been told</h1>
+      <p class="sub">It has gone to their phone. You can stay on this page to see their reply.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="label">CONVERSATION</div>
+      <div class="thread" id="thread"></div>
+      <textarea id="reply" maxlength="1000" placeholder="Add something else…" style="margin-top:14px"></textarea>
+      <button class="ghost" id="sendReply" style="margin-top:10px">Send another message</button>
+      <p class="foot">Still private. Neither of you sees the other's number.</p>
+    </div>
+  </div>
+
+  <div class="card err" id="error" hidden></div>
+
+  <p class="foot">Scan To Move — your number stays private.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // The project's own API. The anon key is a public, read-limited identifier —
+  // it is in the mobile app's binary too. Everything it can reach is guarded by
+  // row-level security and SECURITY DEFINER functions on the server, which is
+  // where the actual rules live.
+  var API = "https://bblutagmgsyybofkfzuf.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJibHV0YWdtZ3N5eWJvZmtmenVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMTc2MzAsImV4cCI6MjEwMjg5MzYzMH0.AZDrdTS6daflMWCknbZYQpX-C7tLk2BgnQXRtbEk4pc";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var token = null, reason = null, jwt = null, refreshToken = null,
+      scanId = null, pollTimer = null;
+  var SESSION_KEY = "scan2move_scanner_session_v1";
+
+  function readStored(key){
+    try { return localStorage.getItem(key); } catch (_) { return null; }
+  }
+  function writeStored(key, value){
+    try {
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
+    } catch (_) { /* private browsing may disable storage; this visit still works */ }
+  }
+  function scanKey(){ return "scan2move_thread_" + token; }
+  function saveSession(payload){
+    jwt = payload && payload.access_token || null;
+    refreshToken = payload && payload.refresh_token || null;
+    if (jwt && refreshToken) {
+      writeStored(SESSION_KEY, JSON.stringify({
+        access_token: jwt,
+        refresh_token: refreshToken,
+        expires_at: Math.floor(Date.now() / 1000) + Number(payload.expires_in || 3600)
+      }));
+    }
+  }
+
+  function show(id){ ["loading","bad","compose","sent"].forEach(function(k){ $(k).hidden = (k !== id); }); }
+  function fail(msg){ $("error").hidden = false; $("error").textContent = msg; }
+
+  // The token may arrive as ?t=, ?token=, or as the last path segment, so the
+  // same file works whatever URL shape ends up on the printed sticker.
+  function readToken(){
+    var q = new URLSearchParams(location.search);
+    var t = q.get("t") || q.get("token");
+    if (!t) {
+      var parts = location.pathname.split("/").filter(Boolean);
+      var last = parts[parts.length - 1] || "";
+      if (/^[a-f0-9]{32,64}$/i.test(last)) t = last;
+    }
+    return t && /^[a-f0-9]{32,64}$/i.test(t) ? t.toLowerCase() : null;
+  }
+
+  function api(path, body, auth){
+    return fetch(API + path, {
+      method: "POST",
+      headers: {
+        "apikey": ANON,
+        "Authorization": "Bearer " + (auth || ANON),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body || {})
+    }).then(function(r){
+      return r.json().catch(function(){ return null; }).then(function(body){
+        if (!r.ok) throw new Error(body && (body.message || body.error_description) || "request_failed");
+        return body;
+      });
+    });
+  }
+
+  // An anonymous identity, created silently. Without one the scanner can send a
+  // message but can never read the answer, because the thread is scoped to the
+  // scan's scanner_id. A one-way product would be a broken promise, not a
+  // smaller feature.
+  function createAnonSession(){
+    return fetch(API + "/auth/v1/signup", {
+      method: "POST",
+      headers: { "apikey": ANON, "Content-Type": "application/json" },
+      body: "{}"
+    }).then(function(r){ return r.json(); })
+      .then(function(j){ saveSession(j); })
+      .catch(function(){ jwt = null; });   // sending still works without it
+  }
+
+  function signInAnon(){
+    var saved = null;
+    try { saved = JSON.parse(readStored(SESSION_KEY) || "null"); } catch (_) {}
+    if (!saved || !saved.refresh_token) return createAnonSession();
+
+    // Refreshing restores the same anonymous user, which is what RLS uses to
+    // authorize the old thread. Storing only the scan id cannot do that.
+    return fetch(API + "/auth/v1/token?grant_type=refresh_token", {
+      method: "POST",
+      headers: { "apikey": ANON, "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: saved.refresh_token })
+    }).then(function(r){
+      if (!r.ok) throw new Error("expired_session");
+      return r.json();
+    }).then(saveSession).catch(function(){
+      writeStored(SESSION_KEY, null);
+      return createAnonSession();
+    });
+  }
+
+  function resolve(){
+    return api("/rest/v1/rpc/resolve_tag", { p_token: token }, jwt).then(function(rows){
+      var row = rows && rows[0];
+
+      // A paused or unknown code returns no row at all — it does not come back
+      // as a status — so there is nothing to distinguish here, and the generic
+      // wording on the "isn't active" card already covers both honestly.
+      if (!row || row.result !== "ok") { show("bad"); return false; }
+
+      // Only ever a label and a type. The server does not send us a name, a
+      // number or a plate, so there is nothing here that could leak.
+      $("vname").textContent = row.vehicle_label || "This vehicle";
+      $("vtype").textContent = row.vehicle_type ? String(row.vehicle_type) : "";
+
+      // A vehicle reported lost or stolen still resolves as "ok" — verified
+      // against the live function, which returns tag_status 'lost' with
+      // result 'ok'. Without this, whoever found it would be shown the
+      // ordinary "is it blocking you?" form, which is the wrong question and
+      // wastes the one moment that matters to the owner.
+      if (row.tag_status === "lost") {
+        $("lostNote").hidden = false;
+        $("reasons").hidden = true;
+        $("reasonLabel").hidden = true;
+        $("body").placeholder =
+          "For example: I found this vehicle parked on Church Street. It looks undamaged.";
+        $("send").textContent = "Tell the owner where it is";
+        $("sendHint").textContent = "Anything you can say about where it is will help.";
+        reason = "found";
+        refreshSend();
+      }
+
+      scanId = readStored(scanKey());
+      if (scanId && jwt) {
+        show("sent");
+        loadThread();
+        if (!pollTimer) pollTimer = setInterval(loadThread, 5000);
+      } else {
+        show("compose");
+      }
+      return true;
+    });
+  }
+
+  function refreshSend(){
+    $("send").disabled = !(reason || $("body").value.trim().length > 0);
+  }
+
+  $("reasons").addEventListener("click", function(e){
+    var b = e.target.closest(".reason"); if (!b) return;
+    Array.prototype.forEach.call(this.querySelectorAll(".reason"), function(x){
+      x.setAttribute("aria-pressed", String(x === b && x.getAttribute("aria-pressed") !== "true"));
+    });
+    reason = b.getAttribute("aria-pressed") === "true" ? b.getAttribute("data-r") : null;
+    refreshSend();
+  });
+
+  $("body").addEventListener("input", function(){
+    $("count").textContent = String(this.value.length);
+    refreshSend();
+  });
+
+  function defaultBody(){
+    return ({
+      blocking: "Your vehicle is blocking the way, please move it when you can.",
+      lights_on:    "Your vehicle's lights have been left on.",
+      window_open:  "A window or door on your vehicle looks open.",
+      parked_badly: "Someone needs help with parking near your vehicle.",
+      damage:   "Your vehicle may have been damaged — please come and check.",
+          found:    "I have found your vehicle — I am telling you where it is."
+    })[reason] || "Someone needs you at your vehicle.";
+  }
+
+  $("send").addEventListener("click", function(){
+    var btn = this; btn.disabled = true; btn.textContent = "Sending…";
+    var text = $("body").value.trim() || defaultBody();
+    api("/rest/v1/rpc/send_scan_message",
+        { p_token: token, p_body: text, p_reason: reason || "other" }, jwt)
+    .then(function(rows){
+      var row = rows && rows[0];
+      if (!row || row.status !== "ok") {
+        btn.disabled = false; btn.textContent = "Send to the owner";
+        if (row && row.status === "rate_limited") return fail("That's a lot of messages from here in the last hour. Please wait a little and try again.");
+        if (row && row.status === "invalid_message") return fail("Please write a slightly longer message.");
+        return fail("That didn't send. Please check your connection and try again.");
+      }
+      scanId = row.scan_id;
+      writeStored(scanKey(), scanId);
+      $("error").hidden = true;
+      show("sent");
+      addMsg(text, true);
+      if (jwt && scanId) { loadThread(); pollTimer = setInterval(loadThread, 5000); }
+    })
+    .catch(function(){
+      btn.disabled = false; btn.textContent = "Send to the owner";
+      fail("That didn't send. Please check your connection and try again.");
+    });
+  });
+
+  function addMsg(text, mine){
+    var d = document.createElement("div");
+    d.className = "msg " + (mine ? "mine" : "theirs");
+    var w = document.createElement("div");
+    w.className = "who"; w.textContent = mine ? "YOU" : "THE OWNER";
+    var p = document.createElement("div"); p.textContent = text;   // never innerHTML
+    d.appendChild(w); d.appendChild(p);
+    $("thread").appendChild(d);
+  }
+
+  function loadThread(){
+    if (!jwt || !scanId) return;
+    fetch(API + "/rest/v1/messages?select=body,sender_type,created_at&scan_id=eq." +
+          encodeURIComponent(scanId) + "&order=created_at.asc",
+          { headers: { "apikey": ANON, "Authorization": "Bearer " + jwt } })
+    .then(function(r){
+      if (r.status === 401 || r.status === 403) {
+        writeStored(scanKey(), null);
+        scanId = null;
+        show("compose");
+        return null;
+      }
+      return r.ok ? r.json() : null;
+    })
+    .then(function(rows){
+      if (!rows || !rows.length) return;
+      $("thread").innerHTML = "";
+      rows.forEach(function(m){ addMsg(m.body, m.sender_type !== "owner"); });
+    })
+    .catch(function(){ /* polling is a convenience; silence is correct here */ });
+  }
+
+  $("sendReply").addEventListener("click", function(){
+    var t = $("reply").value.trim(); if (!t || !scanId) return;
+    var btn = this; btn.disabled = true; btn.textContent = "Sending…";
+    api("/rest/v1/rpc/post_reply", { p_scan_id: scanId, p_body: t }, jwt)
+    .then(function(rows){
+      var row = rows && rows[0];
+      if (!row || row.status !== "ok") throw new Error(row && row.status || "reply_failed");
+      $("reply").value = ""; btn.disabled = false; btn.textContent = "Send another message";
+      addMsg(t, true); loadThread();
+    })
+    .catch(function(){ btn.disabled = false; btn.textContent = "Send another message"; });
+  });
+
+  token = readToken();
+  if (!token) { show("bad"); $("badWhy").textContent = "This link is missing its code. Please scan the sticker again."; }
+  else { signInAnon().then(resolve).catch(function(){ show("bad"); }); }
+})();
+</script>
+</body>
+</html>

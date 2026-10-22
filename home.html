@@ -1,0 +1,448 @@
+<title>Scan To Move</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    /* night — the hero band, where the product's moment actually happens */
+    --night:#0B1222; --night-2:#131E36; --glass:#1B2B4D; --night-ink:#EAF0FF; --night-ink-2:#93A4C6;
+    /* day — the reading surfaces */
+    --paper:#F4F7FB; --card:#FFFFFF; --sunk:#EAF0F7;
+    --ink:#0D1424; --ink-2:#47536B; --ink-3:#7C89A1; --hair:rgba(13,20,36,.10);
+    /* signal */
+    --mint:#00C48C; --mint-lit:#2BE6AC; --mint-deep:#007D5B; --mint-wash:#E0F8EF;
+    --iris:#6E6BFF; --iris-wash:#EBEAFF;
+    --amber:#FFB020; --coral:#D43F2C; --coral-wash:#FCE9E6;
+    --display:'Archivo',ui-sans-serif,system-ui,sans-serif;
+    --body:'Manrope',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --lift:0 1px 2px rgba(13,20,36,.05), 0 18px 40px -18px rgba(13,20,36,.22);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --paper:#080D18; --card:#101A2D; --sunk:#0C1424;
+      --ink:#E9EFFA; --ink-2:#A3B1C9; --ink-3:#71809A; --hair:rgba(255,255,255,.11);
+      --mint-deep:#5CEFC0; --mint-wash:rgba(0,196,140,.13);
+      --iris-wash:rgba(110,107,255,.16); --coral:#FF8A76; --coral-wash:rgba(255,138,118,.13);
+      --lift:0 1px 2px rgba(0,0,0,.5), 0 20px 44px -20px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --paper:#080D18; --card:#101A2D; --sunk:#0C1424;
+    --ink:#E9EFFA; --ink-2:#A3B1C9; --ink-3:#71809A; --hair:rgba(255,255,255,.11);
+    --mint-deep:#5CEFC0; --mint-wash:rgba(0,196,140,.13);
+    --iris-wash:rgba(110,107,255,.16); --coral:#FF8A76; --coral-wash:rgba(255,138,118,.13);
+    --lift:0 1px 2px rgba(0,0,0,.5), 0 20px 44px -20px rgba(0,0,0,.8);
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--paper); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px; margin:0 auto; padding-inline:20px}
+  h1,h2,h3{font-family:var(--display); margin:0; line-height:1.08; letter-spacing:-.025em; text-wrap:balance}
+  h1{font-size:clamp(2rem,5vw,3.15rem); font-weight:800}
+  h2{font-size:clamp(1.6rem,4vw,2.5rem); font-weight:700}
+  h3{font-size:1.06rem; font-weight:700; letter-spacing:-.01em}
+  p{margin:0}
+  .lede{font-size:clamp(1.02rem,1.9vw,1.2rem); color:var(--ink-2); max-width:58ch}
+  .eyebrow{font-family:var(--mono); font-size:.72rem; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--mint-deep)}
+  section{padding-block:clamp(54px,8vw,92px)}
+
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:9px; font-family:var(--body); font-weight:700; font-size:.95rem; padding:14px 24px; border-radius:999px; border:1px solid transparent; text-decoration:none; cursor:pointer; transition:transform .12s, filter .12s, background .12s}
+  .btn:active{transform:scale(.985)}
+  .btn-primary{background:var(--mint); color:#00281C; box-shadow:0 8px 24px -8px rgba(0,196,140,.75)}
+  .btn-primary:hover{filter:brightness(1.07)}
+  .btn-ghost{background:rgba(255,255,255,.07); color:var(--night-ink); border-color:rgba(255,255,255,.18)}
+  .btn-ghost:hover{background:rgba(255,255,255,.13)}
+  .btn-quiet{background:transparent; color:var(--ink); border-color:var(--hair)}
+  :focus-visible{outline:2.5px solid var(--iris); outline-offset:3px; border-radius:8px}
+
+  /* ── the night band ───────────────────────────────────── */
+  .night{
+    background:
+      radial-gradient(900px 420px at 18% 8%, rgba(110,107,255,.20), transparent 62%),
+      radial-gradient(760px 420px at 88% 86%, rgba(0,196,140,.17), transparent 60%),
+      linear-gradient(176deg, var(--night) 0%, var(--night-2) 100%);
+    color:var(--night-ink); position:relative; overflow:hidden;
+  }
+  .night h1,.night h2{color:var(--night-ink)}
+  .night .lede{color:var(--night-ink-2)}
+
+  .bar{display:flex; align-items:center; justify-content:space-between; gap:16px; padding-block:18px; position:relative; z-index:3}
+  .mark{display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:800; letter-spacing:-.03em; color:var(--night-ink); font-size:1.02rem}
+
+  .hero{display:grid; grid-template-columns:1fr; gap:clamp(34px,5vw,56px); align-items:center; padding-bottom:clamp(54px,8vw,86px); position:relative; z-index:2}
+  @media (min-width:920px){ .hero{grid-template-columns:1.02fr .98fr} }
+  .hero-copy{display:flex; flex-direction:column; gap:22px; align-items:flex-start}
+  .tagpill{display:inline-flex; align-items:center; gap:9px; padding:7px 15px 7px 11px; border-radius:999px; background:rgba(0,196,140,.14); border:1px solid rgba(0,196,140,.34); color:var(--mint-lit); font-weight:700; font-size:.83rem}
+  .cta-row{display:flex; flex-wrap:wrap; gap:12px}
+  .micro{font-size:.86rem; color:var(--night-ink-2)}
+
+  .scene{width:100%; height:auto; max-width:100%; display:block; filter:drop-shadow(0 30px 60px rgba(0,0,0,.45))}
+
+  /* scene motion — one 9s loop, everything legible at rest */
+  @keyframes sweep{0%{transform:translateX(-120px)}55%,100%{transform:translateX(420px)}}
+  @keyframes modules{0%,12%{opacity:.35}18%,100%{opacity:1}}
+  @keyframes ping{0%,16%{r:30; opacity:0}22%{opacity:.85}60%,100%{r:150; opacity:0}}
+  @keyframes travel{0%,24%{offset-distance:0%; opacity:0}28%{opacity:1}62%{offset-distance:100%; opacity:1}68%,100%{offset-distance:100%; opacity:0}}
+  @keyframes buzz{0%,62%{transform:translate(0,0)}65%{transform:translate(2px,-2px)}68%{transform:translate(-2px,1px)}71%{transform:translate(1px,-1px)}74%,100%{transform:translate(0,0)}}
+  @keyframes lightUp{0%,58%{opacity:.5}66%{opacity:1}92%,100%{opacity:.5}}
+  @keyframes blink{0%,46%{opacity:.25}52%,100%{opacity:1}}
+  .sweep{animation:sweep 9s cubic-bezier(.4,0,.2,1) infinite}
+  .mods{animation:modules 9s infinite}
+  .ping1{animation:ping 9s ease-out infinite}
+  .ping2{animation:ping 9s ease-out infinite .5s}
+  .ping3{animation:ping 9s ease-out infinite 1s}
+  .spark{animation:travel 9s cubic-bezier(.3,0,.3,1) infinite; offset-path:path('M 232 196 C 300 150, 360 168, 418 150'); offset-rotate:0deg}
+  .reciever{animation:buzz 9s infinite}
+  .notif{animation:lightUp 9s infinite}
+  .cursorline{animation:blink 9s infinite}
+  @media (prefers-reduced-motion:reduce){
+    .sweep,.mods,.ping1,.ping2,.ping3,.spark,.reciever,.notif,.cursorline{animation:none}
+    .ping1,.ping2,.ping3{opacity:.35}
+    .spark{opacity:1; offset-distance:60%}
+    .notif{opacity:1}
+  }
+
+  /* road-marking divider */
+  .lane{height:10px; background:repeating-linear-gradient(90deg, var(--hair) 0 34px, transparent 34px 62px); border-radius:2px; margin-block:4px}
+  .night .lane{background:repeating-linear-gradient(90deg, rgba(255,255,255,.16) 0 34px, transparent 34px 62px)}
+
+  /* ── plate ────────────────────────────────────────────── */
+  .plate{display:inline-flex; align-items:center; gap:10px; font-family:var(--mono); font-weight:600; letter-spacing:.1em; background:#FFF; color:#0D1424; border:2.5px solid #0D1424; border-radius:7px; padding:7px 13px; font-size:.95rem}
+
+  /* ── compare ──────────────────────────────────────────── */
+  .compare{display:grid; gap:18px; grid-template-columns:1fr; margin-top:30px}
+  @media (min-width:720px){ .compare{grid-template-columns:1fr 1fr} }
+  .col{border-radius:22px; padding:26px; border:1px solid var(--hair); background:var(--card); transition:transform .18s ease}
+  .col.ours{border-color:var(--mint); box-shadow:var(--lift)}
+  .col:hover{transform:translateY(-3px)}
+  .row{display:flex; gap:12px; align-items:flex-start; padding-block:10px; font-size:.94rem}
+  .row + .row{border-top:1px solid var(--hair)}
+  .row svg{flex:0 0 auto; margin-top:2px}
+
+  /* ── steps ────────────────────────────────────────────── */
+  .steps{display:grid; gap:18px; grid-template-columns:1fr; margin-top:32px}
+  @media (min-width:800px){ .steps{grid-template-columns:repeat(3,1fr)} }
+  .step{background:var(--card); border:1px solid var(--hair); border-radius:20px; padding:24px; position:relative; overflow:hidden; transition:transform .18s ease, box-shadow .18s ease}
+  .step:hover{transform:translateY(-3px); box-shadow:var(--lift)}
+  .step .n{font-family:var(--mono); font-size:.74rem; font-weight:600; color:var(--mint-deep); letter-spacing:.14em}
+  .step h3{margin:12px 0 7px}
+  .step p{color:var(--ink-2); font-size:.93rem}
+  .step .art{margin-top:16px; display:block}
+
+  /* ── order ────────────────────────────────────────────── */
+  .order{background:var(--card); border:1px solid var(--hair); border-radius:26px; padding:clamp(24px,4vw,38px); box-shadow:var(--lift)}
+  .fields{display:grid; gap:15px; grid-template-columns:1fr; margin-top:24px}
+  @media (min-width:660px){ .fields{grid-template-columns:1fr 1fr} .span2{grid-column:1 / -1} }
+  label{display:block; font-size:.78rem; font-weight:700; color:var(--ink-2); margin-bottom:7px; letter-spacing:.02em}
+  input,select,textarea{width:100%; font-family:var(--body); font-size:.95rem; color:var(--ink); background:var(--sunk); border:1.5px solid var(--hair); border-radius:13px; padding:13px 14px}
+  textarea{resize:vertical; min-height:80px}
+  input:focus,select:focus,textarea:focus{outline:none; border-color:var(--mint)}
+  .ready{margin-top:22px; padding:20px; border-radius:18px; background:var(--mint-wash); border:1px solid var(--mint)}
+  pre{margin:12px 0 0; padding:15px; border-radius:13px; background:var(--card); border:1px solid var(--hair); overflow-x:auto; font-family:var(--mono); font-size:.82rem; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
+  .mail{font-family:var(--mono); font-size:.9rem; background:var(--sunk); border:1px solid var(--hair); border-radius:10px; padding:8px 12px; display:inline-block; user-select:all}
+
+  footer{padding-block:38px; color:var(--night-ink-2); font-size:.88rem}
+  .foot{display:flex; flex-wrap:wrap; gap:14px 28px; justify-content:space-between; align-items:center}
+  .foot a{color:var(--night-ink); text-decoration:none}
+  .foot a:hover{color:var(--mint-lit)}
+</style>
+
+<div class="night">
+  <div class="wrap bar">
+    <div class="mark">
+      <svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="2.4" y="2.4" width="7.6" height="7.6" rx="2.3" stroke="#2BE6AC" stroke-width="2.1"/>
+        <rect x="14" y="2.4" width="7.6" height="7.6" rx="2.3" stroke="#2BE6AC" stroke-width="2.1"/>
+        <rect x="2.4" y="14" width="7.6" height="7.6" rx="2.3" stroke="#2BE6AC" stroke-width="2.1"/>
+        <rect x="15.4" y="15.4" width="4.8" height="4.8" rx="1.5" fill="#2BE6AC"/>
+      </svg>
+      Scan&nbsp;To&nbsp;Move
+    </div>
+    <a class="btn btn-primary" href="#order">Get a sticker</a>
+  </div>
+
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <span class="tagpill">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3l7.2 3v5.6c0 4.4-3 7.7-7.2 9.2-4.2-1.5-7.2-4.8-7.2-9.2V6L12 3z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+          <circle cx="8.9" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="15.1" cy="12" r="1" fill="currentColor"/>
+        </svg>
+        Nobody's number crosses the gap
+      </span>
+
+      <h1>Blocked in at 11pm.<br>Nobody wants to leave a phone number on the glass.</h1>
+
+      <p class="lede">
+        A sticker on your windscreen. They scan it, they tell you, your phone buzzes,
+        you reply. The message gets through. The number never does — in either direction.
+      </p>
+
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#order">Get a sticker</a>
+        <a class="btn btn-ghost" href="#how">Watch it work</a>
+      </div>
+      <p class="micro">Cars, bikes, helmets. The person scanning needs no app and no account.</p>
+    </div>
+
+    <!-- The moment, drawn: light crosses the glass, the tag answers, the signal
+         travels to a phone — and the two numbers sit at either end, never moving. -->
+    <svg class="scene" viewBox="0 0 520 300" role="img"
+         aria-label="A sticker on a windscreen at night. A scan sends a message across to a phone, while both phone numbers stay behind, masked.">
+      <defs>
+        <linearGradient id="gl" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2A3E66" stop-opacity=".92"/>
+          <stop offset="1" stop-color="#16233E" stop-opacity=".92"/>
+        </linearGradient>
+        <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+          <stop offset=".5" stop-color="#fff" stop-opacity=".22"/>
+          <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <clipPath id="glassclip"><rect x="24" y="92" width="226" height="168" rx="20"/></clipPath>
+        <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+          <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- windscreen -->
+      <rect x="24" y="92" width="226" height="168" rx="20" fill="url(#gl)" stroke="rgba(255,255,255,.16)"/>
+      <g clip-path="url(#glassclip)">
+        <path d="M24 212 Q 130 176 250 206 L250 260 L24 260Z" fill="rgba(255,255,255,.045)"/>
+        <rect class="sweep" x="0" y="92" width="86" height="168" fill="url(#shine)"/>
+      </g>
+      <text x="38" y="84" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="2.4" fill="#93A4C6">WINDSCREEN</text>
+
+      <!-- the sticker -->
+      <rect x="92" y="150" width="92" height="92" rx="15" fill="#F6FBFF"/>
+      <g class="mods" fill="#0B1222">
+        <rect x="104" y="162" width="19" height="19" rx="4"/><rect x="153" y="162" width="19" height="19" rx="4"/>
+        <rect x="104" y="211" width="19" height="19" rx="4"/>
+        <rect x="131" y="162" width="8" height="8" rx="2"/><rect x="131" y="180" width="8" height="8" rx="2"/>
+        <rect x="149" y="190" width="8" height="8" rx="2"/><rect x="131" y="203" width="8" height="8" rx="2"/>
+        <rect x="149" y="211" width="8" height="8" rx="2"/><rect x="163" y="196" width="8" height="8" rx="2"/>
+        <rect x="113" y="193" width="8" height="8" rx="2"/>
+      </g>
+      <!-- scanner brackets -->
+      <g stroke="#2BE6AC" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".9">
+        <path d="M84 166v-12h12"/><path d="M192 166v-12h-12"/><path d="M84 226v12h12"/><path d="M192 226v12h-12"/>
+      </g>
+      <!-- signal leaving the tag -->
+      <g fill="none" stroke="#2BE6AC" stroke-width="1.7" opacity=".85">
+        <circle class="ping1" cx="138" cy="196" r="30"/>
+        <circle class="ping2" cx="138" cy="196" r="30"/>
+        <circle class="ping3" cx="138" cy="196" r="30"/>
+      </g>
+
+      <!-- the path the message takes -->
+      <path d="M 232 196 C 300 150, 360 168, 418 150" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.6" stroke-dasharray="5 7"/>
+      <circle class="spark" cx="0" cy="0" r="4.6" fill="#2BE6AC" filter="url(#glow)"/>
+
+      <!-- the owner's phone -->
+      <g class="reciever">
+        <rect x="392" y="60" width="104" height="186" rx="19" fill="#101A2D" stroke="rgba(255,255,255,.2)"/>
+        <rect x="402" y="74" width="84" height="158" rx="12" fill="#0B1222"/>
+        <g class="notif">
+          
+          <rect x="408" y="84" width="72" height="42" rx="10" fill="rgba(0,196,140,.17)" stroke="rgba(0,196,140,.5)"/>
+          <circle cx="421" cy="99" r="7" fill="#2BE6AC"/>
+          <rect x="433" y="94" width="40" height="4.6" rx="2.3" fill="#EAF0FF" opacity=".92"/>
+          <rect x="433" y="104" width="30" height="4" rx="2" fill="#93A4C6"/>
+          <rect x="414" y="114" width="56" height="3.6" rx="1.8" fill="#93A4C6" opacity=".7"/>
+        </g>
+        <rect x="414" y="140" width="52" height="15" rx="7.5" fill="rgba(255,255,255,.08)"/>
+        <rect x="430" y="162" width="50" height="15" rx="7.5" fill="rgba(110,107,255,.4)"/>
+        <rect x="414" y="184" width="44" height="15" rx="7.5" fill="rgba(255,255,255,.08)"/>
+        <rect class="cursorline" x="414" y="210" width="2.4" height="13" rx="1.2" fill="#2BE6AC"/>
+      </g>
+      <text x="392" y="268" font-family="IBM Plex Mono, monospace" font-size="10.5" letter-spacing="2.4" fill="#93A4C6">YOUR PHONE</text>
+
+      <!-- what does NOT cross -->
+      <g opacity=".95">
+        <rect x="24" y="24" width="150" height="34" rx="12" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.14)"/>
+        <text x="36" y="39" font-family="IBM Plex Mono, monospace" font-size="8.6" letter-spacing="1.6" fill="#71809A">THEIR NUMBER</text>
+        <g fill="#5A6B8C"><circle cx="38" cy="49" r="2.6"/><circle cx="48" cy="49" r="2.6"/><circle cx="58" cy="49" r="2.6"/><circle cx="68" cy="49" r="2.6"/><circle cx="78" cy="49" r="2.6"/><circle cx="88" cy="49" r="2.6"/></g>
+        <rect x="346" y="24" width="150" height="34" rx="12" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.14)"/>
+        <text x="358" y="39" font-family="IBM Plex Mono, monospace" font-size="8.6" letter-spacing="1.6" fill="#71809A">YOUR NUMBER</text>
+        <g fill="#5A6B8C"><circle cx="360" cy="49" r="2.6"/><circle cx="370" cy="49" r="2.6"/><circle cx="380" cy="49" r="2.6"/><circle cx="390" cy="49" r="2.6"/><circle cx="400" cy="49" r="2.6"/><circle cx="410" cy="49" r="2.6"/></g>
+        <path d="M186 41h148" stroke="#D43F2C" stroke-width="1.7" stroke-dasharray="4 5" opacity=".75"/>
+        <g transform="translate(260,41)">
+          <circle r="11" fill="#1B2B4D" stroke="#D43F2C" stroke-width="1.7"/>
+          <path d="M-4.2-4.2l8.4 8.4M4.2-4.2l-8.4 8.4" stroke="#D43F2C" stroke-width="2" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap"><div class="lane"></div></div>
+</div>
+
+<main>
+  <section class="wrap" id="how">
+    <span class="eyebrow">How it works</span>
+    <h2 style="margin-top:12px">Three things, then it sits on the glass and waits.</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="n">01</span>
+        <h3>Stick it on</h3>
+        <p>Inside the windscreen, on the tank, or on the helmet. Waterproof, and it survives a summer parked outside.</p>
+        <svg class="art" width="100%" height="56" viewBox="0 0 220 56" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="218" height="54" rx="12" fill="var(--sunk)"/>
+          <rect x="88" y="11" width="34" height="34" rx="7" fill="var(--card)" stroke="var(--mint)" stroke-width="1.6"/>
+          <g fill="var(--mint)"><rect x="94" y="17" width="8" height="8" rx="2"/><rect x="108" y="17" width="8" height="8" rx="2"/><rect x="94" y="31" width="8" height="8" rx="2"/><rect x="109" y="32" width="6" height="6" rx="1.6"/></g>
+          <path d="M20 44h48M152 44h48" stroke="var(--hair)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="step">
+        <span class="n">02</span>
+        <h3>Someone scans it</h3>
+        <p>Any phone camera opens it. No app, no account, no sign-up. They pick a reason and write one line.</p>
+        <svg class="art" width="100%" height="56" viewBox="0 0 220 56" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="218" height="54" rx="12" fill="var(--sunk)"/>
+          <rect x="16" y="12" width="74" height="14" rx="7" fill="var(--mint-wash)" stroke="var(--mint)" stroke-width="1.2"/>
+          <text x="25" y="22.5" font-family="Manrope, sans-serif" font-size="8.6" font-weight="700" fill="var(--mint-deep)">Blocking me</text>
+          <rect x="16" y="32" width="60" height="12" rx="6" fill="var(--card)" stroke="var(--hair)"/>
+          <rect x="104" y="12" width="100" height="32" rx="9" fill="var(--card)" stroke="var(--hair)"/>
+          <rect x="112" y="20" width="70" height="3.6" rx="1.8" fill="var(--ink-3)"/>
+          <rect x="112" y="29" width="52" height="3.6" rx="1.8" fill="var(--ink-3)" opacity=".6"/>
+        </svg>
+      </div>
+      <div class="step">
+        <span class="n">03</span>
+        <h3>You get it instantly</h3>
+        <p>Your phone buzzes with what they need. Reply straight back. It stays between the two of you, and you can stop it any time.</p>
+        <svg class="art" width="100%" height="56" viewBox="0 0 220 56" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="218" height="54" rx="12" fill="var(--sunk)"/>
+          <rect x="14" y="13" width="120" height="14" rx="7" fill="var(--card)" stroke="var(--hair)"/>
+          <rect x="22" y="18.5" width="90" height="3.6" rx="1.8" fill="var(--ink-3)"/>
+          <rect x="86" y="33" width="120" height="14" rx="7" fill="var(--iris-wash)"/>
+          <rect x="96" y="38.5" width="76" height="3.6" rx="1.8" fill="var(--iris)"/>
+          <circle cx="196" cy="20" r="9" fill="var(--mint)"/>
+          <path d="M192.6 20.2l2.4 2.4 4.4-4.6" stroke="#00281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <span class="eyebrow">The difference</span>
+    <h2 style="margin-top:12px">Most vehicle stickers just hand out your number.</h2>
+    <p class="lede" style="margin-top:14px">
+      Worth reading twice. A contact sticker that shows your number has given a
+      stranger something you can't take back — and you'll never know who copied it.
+    </p>
+
+    <div class="compare">
+      <div class="col">
+        <h3 style="color:var(--coral); margin-bottom:14px">A sticker that shows your number</h3>
+        <div class="row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="var(--coral)" stroke-width="2"/><path d="M9 9l6 6M15 9l-6 6" stroke="var(--coral)" stroke-width="2" stroke-linecap="round"/></svg><span>Anyone walking past can save it</span></div>
+        <div class="row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="var(--coral)" stroke-width="2"/><path d="M9 9l6 6M15 9l-6 6" stroke="var(--coral)" stroke-width="2" stroke-linecap="round"/></svg><span>Once it's out, it's out for good</span></div>
+        <div class="row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="var(--coral)" stroke-width="2"/><path d="M9 9l6 6M15 9l-6 6" stroke="var(--coral)" stroke-width="2" stroke-linecap="round"/></svg><span>Marketing calls, spam, and worse</span></div>
+      </div>
+
+      <div class="col ours">
+        <h3 style="color:var(--mint-deep); margin-bottom:14px">Scan To Move</h3>
+        <div class="row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="var(--mint)" stroke-width="2"/><path d="M8.2 12.3l2.6 2.6 5-5.2" stroke="var(--mint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Your number is never sent to the page they open</span></div>
+        <div class="row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="var(--mint)" stroke-width="2"/><path d="M8.2 12.3l2.6 2.6 5-5.2" stroke="var(--mint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Theirs isn't shown to you either — it goes both ways</span></div>
+        <div class="row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="var(--mint)" stroke-width="2"/><path d="M8.2 12.3l2.6 2.6 5-5.2" stroke="var(--mint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Pause the sticker and it stops working, instantly</span></div>
+        <div class="row"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="var(--mint)" stroke-width="2"/><path d="M8.2 12.3l2.6 2.6 5-5.2" stroke="var(--mint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Report anything unpleasant, from inside the message</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="order">
+    <div class="order">
+      <span class="eyebrow">Get a sticker</span>
+      <h2 style="margin-top:12px">Tell us about your vehicle.</h2>
+      <p class="lede" style="margin-top:13px">
+        Fill this in and we'll write back with the price and when it ships.
+        We only ask for what's needed to print it and post it.
+      </p>
+
+      <form id="orderForm" novalidate>
+        <div class="fields">
+          <div><label for="f-name">Your name</label><input id="f-name" type="text" autocomplete="name" placeholder="Alex Kumar"></div>
+          <div><label for="f-email">Email</label><input id="f-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+          <div><label for="f-vehicle">Vehicle</label>
+            <select id="f-vehicle"><option>Car</option><option>Bike</option><option>Bike + helmet</option><option>Other</option></select>
+          </div>
+          <div><label for="f-plate">Registration number</label><input id="f-plate" type="text" placeholder="KA 01 AB 1234"></div>
+          <div class="span2"><label for="f-where">Where should we post it?</label><textarea id="f-where" placeholder="Flat, street, city, PIN code"></textarea></div>
+        </div>
+        <div style="margin-top:22px"><button class="btn btn-primary" type="submit">Prepare my request</button></div>
+      </form>
+
+      <div class="ready" id="ready" hidden>
+        <h3 style="color:var(--mint-deep)">Ready — copy this and email it to us</h3>
+        <p style="margin-top:8px; font-size:.92rem; color:var(--ink-2)">
+          Send it to <span class="mail">anas.official2017@gmail.com</span> and we'll reply with price and delivery.
+        </p>
+        <pre id="summary"></pre>
+        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn btn-primary" type="button" id="copyBtn">Copy the message</button>
+          <button class="btn btn-quiet" type="button" id="editBtn">Change something</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="night">
+  <div class="wrap"><div class="lane"></div></div>
+  <footer class="wrap foot">
+    <span>Scan To Move — a QR tag that keeps your number to yourself.</span>
+    <span style="display:flex; gap:22px; flex-wrap:wrap">
+      <a href="#how">How it works</a><a href="#order">Get a sticker</a>
+    </span>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    "use strict";
+    var form = document.getElementById('orderForm');
+    var ready = document.getElementById('ready');
+    var summary = document.getElementById('summary');
+    var copyBtn = document.getElementById('copyBtn');
+    var editBtn = document.getElementById('editBtn');
+
+    // The page can't post anywhere from inside the viewer, and a form that
+    // looks like it sent something when it didn't is worse than no form. So it
+    // composes the request and hands it over to copy.
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = function (id) { return (document.getElementById(id).value || '').trim(); };
+      summary.textContent = [
+        'I would like a Scan To Move sticker.', '',
+        'Name: ' + (v('f-name') || '—'),
+        'Email: ' + (v('f-email') || '—'),
+        'Vehicle: ' + document.getElementById('f-vehicle').value,
+        'Registration: ' + (v('f-plate') || '—'),
+        'Deliver to: ' + (v('f-where') || '—')
+      ].join('\n');
+      ready.hidden = false;
+      ready.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    copyBtn.addEventListener('click', function () {
+      function select() {
+        var r = document.createRange(); r.selectNodeContents(summary);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        copyBtn.textContent = 'Selected — press Ctrl+C';
+      }
+      try {
+        navigator.clipboard.writeText(summary.textContent).then(function () {
+          copyBtn.textContent = 'Copied';
+          setTimeout(function () { copyBtn.textContent = 'Copy the message'; }, 1800);
+        }, select);
+      } catch (err) { select(); }
+    });
+
+    editBtn.addEventListener('click', function () {
+      ready.hidden = true;
+      document.getElementById('f-name').focus();
+    });
+  })();
+</script>

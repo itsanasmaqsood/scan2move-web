@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delete your account — Scan To Move</title>
+<style>
+:root { color-scheme: light dark; --fg:#1a1a1a; --bg:#fff; --muted:#666; --line:#e3e3e3; --accent:#5B3DF5; }
+@media (prefers-color-scheme: dark) {
+  :root { --fg:#e8e8e8; --bg:#121212; --muted:#9a9a9a; --line:#2c2c2c; --accent:#9d86ff; }
+}
+* { box-sizing: border-box; }
+body { margin:0; padding:32px 20px 64px; background:var(--bg); color:var(--fg);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+main { max-width: 760px; margin: 0 auto; }
+h1 { font-size:1.9rem; line-height:1.25; margin:0 0 8px; }
+h2 { font-size:1.25rem; margin:36px 0 10px; }
+h3 { font-size:1.05rem; margin:24px 0 8px; }
+p, li { color:var(--fg); }
+a { color:var(--accent); }
+code { background:rgba(127,127,127,.15); padding:1px 5px; border-radius:4px; font-size:.9em; }
+hr { border:0; border-top:1px solid var(--line); margin:32px 0; }
+table { border-collapse:collapse; width:100%; margin:16px 0; display:block; overflow-x:auto; }
+th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; font-size:.94rem; }
+th { background:rgba(127,127,127,.09); }
+footer { margin-top:48px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem; }
+</style>
+</head>
+<body>
+<main>
+<h1>Delete your Scan To Move account</h1>
+<p><strong>App:</strong> Scan To Move (<code>com.apexmart.scan2move</code>)</p>
+<p>You can delete your account and all of its data at any time. There are two ways.</p>
+<h2>In the app</h2>
+<p>1. Open <strong>Scan To Move</strong> 2. Go to <strong>More → Settings</strong> 3. Tap <strong>Delete account</strong> 4. Confirm</p>
+<p>The deletion happens immediately.</p>
+<h2>By email</h2>
+<p>If you cannot get into the app, email <strong>anas.official2017@gmail.com</strong> from the address on the account and ask us to delete it. We will confirm within 30 days, usually much sooner.</p>
+<hr>
+<h2>What gets deleted</h2>
+<p>Everything, permanently:</p>
+<ul>
+<li>Your account and login</li>
+<li>Your profile (your name, if you set one)</li>
+<li>Every vehicle and every QR tag you created</li>
+<li>Every scan, conversation and message attached to them</li>
+<li>Your notifications</li>
+<li>Any device registered for push notifications</li>
+</ul>
+<p>Your QR codes stop working immediately. Anyone who scans a sticker for a deleted tag is told the code is not active — they are not shown anything about you.</p>
+<h2>What is kept, and for how long</h2>
+<table><tr><th>Data</th><th>Kept after deletion</th><th>Why</th></tr><tr><td>Rate-limiting counters</td><td>Up to 2 hours</td><td>They hold a salted hash of an IP address, never an account or a name, and exist only to stop message flooding. They expire on a rolling window.</td></tr><tr><td>Crash reports</td><td>Up to 90 days</td><td>Firebase Crashlytics' own retention. These contain a device model, an OS version and a stack trace — not your account.</td></tr></table>
+<p>Nothing else is retained. There is no archive, no backup copy of your account, and no "deactivated" state you can be restored from. Deletion cannot be undone.</p>
+<h2>This is a real deletion</h2>
+<p>The in-app button calls a server function that removes your profile — which cascades to your tags, scans, messages and notifications — and then deletes the login record itself. It is not a sign-out and not a hidden flag.</p>
+<footer>Scan To Move · Questions: <a href="mailto:anas.official2017@gmail.com">anas.official2017@gmail.com</a></footer>
+</main>
+</body>
+</html>

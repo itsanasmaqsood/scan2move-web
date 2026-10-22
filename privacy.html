@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy — Scan To Move</title>
+<style>
+:root { color-scheme: light dark; --fg:#1a1a1a; --bg:#fff; --muted:#666; --line:#e3e3e3; --accent:#5B3DF5; }
+@media (prefers-color-scheme: dark) {
+  :root { --fg:#e8e8e8; --bg:#121212; --muted:#9a9a9a; --line:#2c2c2c; --accent:#9d86ff; }
+}
+* { box-sizing: border-box; }
+body { margin:0; padding:32px 20px 64px; background:var(--bg); color:var(--fg);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+main { max-width: 760px; margin: 0 auto; }
+h1 { font-size:1.9rem; line-height:1.25; margin:0 0 8px; }
+h2 { font-size:1.25rem; margin:36px 0 10px; }
+h3 { font-size:1.05rem; margin:24px 0 8px; }
+p, li { color:var(--fg); }
+a { color:var(--accent); }
+code { background:rgba(127,127,127,.15); padding:1px 5px; border-radius:4px; font-size:.9em; }
+hr { border:0; border-top:1px solid var(--line); margin:32px 0; }
+table { border-collapse:collapse; width:100%; margin:16px 0; display:block; overflow-x:auto; }
+th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; font-size:.94rem; }
+th { background:rgba(127,127,127,.09); }
+footer { margin-top:48px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem; }
+</style>
+</head>
+<body>
+<main>
+<h1>Privacy Policy — Scan To Move</h1>
+<p><strong>Last updated: 22 October 2026</strong></p>
+<p>Scan To Move puts a QR code on your vehicle so a stranger can reach you when your car is blocking someone, your lights are on, or your window is open — <strong>without either of you learning the other's phone number.</strong></p>
+<p>This policy describes exactly what the app stores. It was written against the actual database schema, not from a template. Where we do not collect something, we say so.</p>
+<p>Contact for any privacy question or request: <strong>anas.official2017@gmail.com</strong></p>
+<hr>
+<h2>1. What we collect</h2>
+<h3>If you create an account (vehicle owner)</h3>
+<table><tr><th>Data</th><th>Why</th><th>Required?</th></tr><tr><td>Email address</td><td>It is your login, and the only way to reset your password</td><td>Yes</td></tr><tr><td>Password</td><td>Stored only as a salted hash by our authentication provider; we never see it</td><td>Only for email sign-in</td></tr><tr><td>Display name</td><td>Shown to you in the app</td><td>No</td></tr><tr><td>Vehicle label, type, and registration plate</td><td>So you can tell your own tags apart</td><td>No — a label alone is enough</td></tr><tr><td>Tag records</td><td>The QR codes you create</td><td>Created by you</td></tr><tr><td>Emergency contact name, phone number, and relationship</td><td>To let you quickly call a person you chose from the Emergency screen</td><td>Optional</td></tr><tr><td>Notification preferences and an FCM push token</td><td>To deliver vehicle alerts to this device when you allow notifications</td><td>Optional</td></tr></table>
+<p>If you sign in with Google, we receive your email address and, if you have set one, your name. We do not receive your Google password or your contacts.</p>
+<p><strong>We do not ask for the account holder's phone number.</strong> An earlier version had one in the profile screen; it was removed. If you use Emergency Contacts, you choose to store that contact person's name and phone number. The app does not read your address book and does not disclose emergency contacts to scanners.</p>
+<h3>If you scan someone's tag (you do not need an account)</h3>
+<table><tr><th>Data</th><th>Why</th></tr><tr><td>The message you write</td><td>To deliver it to the owner</td></tr><tr><td>An anonymous session id</td><td>So you can see the owner's reply on your own thread. It is a random identifier, not a name, email or device id</td></tr><tr><td>A salted hash of your IP address</td><td>To stop one person flooding a vehicle owner with messages</td></tr></table>
+<p><strong>We do not store your IP address.</strong> It is combined with a secret salt and hashed; the result cannot be turned back into an address. It exists only to count requests.</p>
+<p><strong>We do not collect your location.</strong> The current release does not request location permission and sends no location data.</p>
+<h3>Automatically</h3>
+<table><tr><th>Data</th><th>Why</th></tr><tr><td>Crash reports and error diagnostics (Firebase Crashlytics)</td><td>To find and fix crashes. Includes device model, OS version and a stack trace</td></tr><tr><td>Firebase installation/push token</td><td>To route an alert to this installation after you allow notifications. It is not used for advertising or cross-app tracking</td></tr></table>
+<hr>
+<h2>2. What the other person can see</h2>
+<p>This is the part that matters most, so it is stated plainly.</p>
+<p><strong>A person who scans your tag can see:</strong> the label you gave the vehicle (for example "Blue Hatchback") and its type. That is all.</p>
+<p><strong>They cannot see:</strong> your name, your email address, your phone number, your registration plate, your account, your other vehicles, or any of your other conversations. This is enforced by the database itself, not only by the app: the lookup a scanner performs returns three fields and no others, and every table is closed to them.</p>
+<p><strong>You cannot see:</strong> who scanned your tag. There is no name, number or email attached to them.</p>
+<hr>
+<h2>3. What we never do</h2>
+<ul>
+<li>We do not sell your data.</li>
+<li>We do not share your data with advertisers, data brokers or insurers.</li>
+<li>We do not run advertising in the app.</li>
+<li>We do not build a profile of you for marketing.</li>
+<li>We do not track you across other apps or websites.</li>
+</ul>
+<hr>
+<h2>4. Who processes your data</h2>
+<table><tr><th>Provider</th><th>Role</th><th>Where</th></tr><tr><td>Supabase</td><td>Database, authentication, realtime messaging</td><td>Mumbai, India (<code>ap-south-1</code>)</td></tr><tr><td>Google Firebase (Crashlytics and Cloud Messaging)</td><td>Crash reporting and optional push delivery</td><td>Google data centres</td></tr><tr><td>Google Play</td><td>App distribution, and sign-in if you choose Google</td><td>Google data centres</td></tr></table>
+<p>We do not use session-replay, heatmap or behavioural analytics tools.</p>
+<hr>
+<h2>5. How long we keep things</h2>
+<table><tr><th>Data</th><th>Retention</th></tr><tr><td>Your account and profile</td><td>Until you delete your account</td></tr><tr><td>Tags</td><td>Until you delete them, or you delete your account</td></tr><tr><td>Conversations and messages</td><td>Until you delete your account or the related tag</td></tr><tr><td>Emergency contacts</td><td>Until you delete the contact or your account</td></tr><tr><td>Push tokens</td><td>Until you sign out, revoke the installation token, or delete your account</td></tr><tr><td>Abuse reports and participant blocks</td><td>Until you delete your account; report status is retained only with the report</td></tr><tr><td>Rate-limit counters (hashed IP)</td><td>Rolling one-hour windows; not kept as history</td></tr><tr><td>Crash reports</td><td>Per Firebase Crashlytics' own retention (90 days)</td></tr></table>
+<hr>
+<h2>6. Deleting your account</h2>
+<p>You can delete your account from <strong>More → Settings → Delete account</strong> inside the app.</p>
+<p>This is a real deletion, not a deactivation. It removes your profile, your vehicles, your tags, every scan and message attached to them, your notifications, and your login itself. Your QR codes stop resolving immediately. It cannot be undone.</p>
+<p>If you cannot access the app, email <strong>anas.official2017@gmail.com</strong> from the address on the account and we will delete it.</p>
+<hr>
+<h2>7. Your rights</h2>
+<p>You can ask us to:</p>
+<ul>
+<li><strong>See</strong> the data we hold about you</li>
+<li><strong>Correct</strong> anything wrong</li>
+<li><strong>Delete</strong> your account and data (or do it yourself, above)</li>
+<li><strong>Export</strong> your data in a machine-readable form</li>
+</ul>
+<p>Email <strong>anas.official2017@gmail.com</strong>. We will respond within 30 days.</p>
+<p>Depending on where you live, these rights may be granted to you by the <strong>Digital Personal Data Protection Act, 2023</strong> (India), the <strong>GDPR</strong> (European Economic Area and UK), or the <strong>CCPA/CPRA</strong> (California). We apply them to everyone regardless of where you are.</p>
+<p>Where the GDPR applies, our legal bases are: <strong>contract</strong> (running the account and delivering messages you or a scanner send), and <strong>legitimate interests</strong> (preventing abuse through rate limiting, and fixing crashes).</p>
+<hr>
+<h2>8. Children</h2>
+<p>Scan To Move is for people who own or drive a vehicle and is not directed at children under 13. We do not knowingly collect data from them. If you believe a child has created an account, email us and we will remove it.</p>
+<hr>
+<h2>9. Security</h2>
+<ul>
+<li>Every table is closed by default; access is granted per-row to the owner only.</li>
+<li>The lookup used when someone scans a tag runs server-side and returns nothing</li>
+</ul>
+<p>that identifies you.</p>
+<ul>
+<li>QR tokens are 128-bit random values generated by the server, not by the app.</li>
+<li>Rate limits are enforced in the database, so they cannot be skipped by a</li>
+</ul>
+<p>modified client.</p>
+<ul>
+<li>IP addresses are salted and hashed before storage.</li>
+<li>Traffic is encrypted in transit (TLS); data is encrypted at rest by Supabase.</li>
+</ul>
+<p>No system is perfectly secure. If you find a vulnerability, please email <strong>anas.official2017@gmail.com</strong> rather than disclosing it publicly, and we will work with you.</p>
+<hr>
+<h2>10. Changes</h2>
+<p>If we change what we collect, we will update this page and the "last updated" date, and — for a change that materially affects you — tell you in the app before it takes effect.</p>
+<footer>Scan To Move · Questions: <a href="mailto:anas.official2017@gmail.com">anas.official2017@gmail.com</a></footer>
+</main>
+</body>
+</html>

@@ -1,5 +1,11 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="description" content="Scan To Move: a QR sticker for your vehicle that lets anyone reach you without seeing your phone number.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Scan To Move — park with your number private">
+<meta property="og:description" content="A QR sticker for your vehicle. Anyone can reach you about it without ever seeing your phone number.">
+<meta property="og:image" content="https://itsanasmaqsood.github.io/scan2move-web/og.png">
+<meta property="og:url" content="https://itsanasmaqsood.github.io/scan2move-web/home.html">
+<meta name="twitter:card" content="summary_large_image">
 <title>Scan To Move</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -141,7 +147,7 @@
   label{display:block; font-size:.78rem; font-weight:700; color:var(--ink-2); margin-bottom:7px; letter-spacing:.02em}
   input,select,textarea{width:100%; font-family:var(--body); font-size:.95rem; color:var(--ink); background:var(--sunk); border:1.5px solid var(--hair); border-radius:13px; padding:13px 14px}
   textarea{resize:vertical; min-height:80px}
-  input:focus,select:focus,textarea:focus{outline:none; border-color:var(--mint)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--mint); outline-offset:2px; border-color:var(--mint)}
   .ready{margin-top:22px; padding:20px; border-radius:18px; background:var(--mint-wash); border:1px solid var(--mint)}
   pre{margin:12px 0 0; padding:15px; border-radius:13px; background:var(--card); border:1px solid var(--hair); overflow-x:auto; font-family:var(--mono); font-size:.82rem; line-height:1.65; white-space:pre-wrap; color:var(--ink)}
   .mail{font-family:var(--mono); font-size:.9rem; background:var(--sunk); border:1px solid var(--hair); border-radius:10px; padding:8px 12px; display:inline-block; user-select:all}
@@ -387,6 +393,17 @@
           <button class="btn btn-quiet" type="button" id="editBtn">Change something</button>
         </div>
       </div>
+    </div>
+  </section>
+  <section class="wrap" id="faq">
+    <span class="eyebrow">Questions</span>
+    <h2 style="margin-top:12px">The things people ask first.</h2>
+    <div style="margin-top:28px; display:grid; gap:14px; max-width:760px">
+      <details class="col"><summary style="font-weight:700; cursor:pointer">Does the person who scans see my phone number?</summary><p class="lede" style="margin-top:10px">No. They never see your number, name or registration plate. They can only send you a message through the app. You reply the same way, and they never see your number either.</p></details>
+      <details class="col"><summary style="font-weight:700; cursor:pointer">Do they need to install anything to contact me?</summary><p class="lede" style="margin-top:10px">No. They scan the sticker with their phone camera and a web page opens. They type a message there. Only you, the owner, use the app.</p></details>
+      <details class="col"><summary style="font-weight:700; cursor:pointer">What if I lose the sticker?</summary><p class="lede" style="margin-top:10px">Mark the tag lost or delete it in the app and it stops working immediately. Until you do, whoever holds the sticker can still message you.</p></details>
+      <details class="col"><summary style="font-weight:700; cursor:pointer">Is my data safe?</summary><p class="lede" style="margin-top:10px">Your details are locked to your account in the database and are never sent to a person who scans your tag. See our <a href="privacy.html">privacy policy</a> for exactly what we store.</p></details>
+      <details class="col"><summary style="font-weight:700; cursor:pointer">How do I get one?</summary><p class="lede" style="margin-top:10px">Fill in the form above and we will write back with the price and delivery. Online payment is coming soon.</p></details>
     </div>
   </section>
 </main>

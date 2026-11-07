@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>Scan To Move</title>
 <!--
   The stranger-facing scan page.
@@ -12,8 +13,8 @@
   non-customer ever sees. It is deliberately one file with no build step, no
   framework and no external request except to the project's own API, so it can
   be dropped into the public storage bucket the owner already controls and
-  served for free. The previous developer's website is not required for any of
-  it.
+  served as static HTML. It is hosted on GitHub Pages (Supabase Storage serves
+  HTML as text/plain, see README).
 
   The rule that shapes every line below: **the scanner never learns who the
   owner is.** No name, no phone number, no plate, no WhatsApp link, no call
@@ -105,7 +106,8 @@
     border:1.5px solid var(--line);background:rgba(255,255,255,.75);
     font:inherit;font-size:15px;color:var(--ink)
   }
-  textarea:focus{outline:none;border-color:var(--mint)}
+  textarea:focus{outline:2px solid var(--mint);outline-offset:2px;border-color:var(--mint)}
+  button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
   .count{font-size:12px;color:var(--ink-faint);text-align:right;margin-top:6px}
 
   button.primary{
@@ -230,12 +232,12 @@
 
       <div class="label" id="reasonLabel">WHY ARE YOU CONTACTING THEM?</div>
       <div class="reasons" id="reasons">
-        <button class="reason" data-r="blocking"  aria-pressed="false"><span class="emo">🚗</span>Blocking my way</button>
-        <button class="reason" data-r="lights_on"    aria-pressed="false"><span class="emo">💡</span>Lights are on</button>
-        <button class="reason" data-r="window_open"  aria-pressed="false"><span class="emo">🚪</span>Window or door open</button>
-        <button class="reason" data-r="parked_badly" aria-pressed="false"><span class="emo">📢</span>Parking help</button>
-        <button class="reason" data-r="damage"    aria-pressed="false"><span class="emo">⚠️</span>Possible damage</button>
-        <button class="reason" data-r="other"     aria-pressed="false"><span class="emo">💬</span>Something else</button>
+        <button class="reason" data-r="blocking"  aria-pressed="false"><span class="emo" aria-hidden="true">🚗</span>Blocking my way</button>
+        <button class="reason" data-r="lights_on"    aria-pressed="false"><span class="emo" aria-hidden="true">💡</span>Lights are on</button>
+        <button class="reason" data-r="window_open"  aria-pressed="false"><span class="emo" aria-hidden="true">🚪</span>Window or door open</button>
+        <button class="reason" data-r="parked_badly" aria-pressed="false"><span class="emo" aria-hidden="true">📢</span>Parking help</button>
+        <button class="reason" data-r="damage"    aria-pressed="false"><span class="emo" aria-hidden="true">⚠️</span>Possible damage</button>
+        <button class="reason" data-r="other"     aria-pressed="false"><span class="emo" aria-hidden="true">💬</span>Something else</button>
       </div>
 
       <div class="label" style="margin-top:20px">MESSAGE</div>
@@ -271,7 +273,7 @@
     </div>
   </div>
 
-  <div class="card err" id="error" hidden></div>
+  <div class="card err" id="error" role="alert" aria-live="assertive" hidden></div>
 
   <p class="foot">Scan To Move — your number stays private.</p>
 </div>
@@ -419,7 +421,7 @@
       if (scanId && jwt) {
         show("sent");
         loadThread();
-        if (!pollTimer) pollTimer = setInterval(loadThread, 5000);
+        startPolling();
       } else {
         show("compose");
       }
@@ -474,7 +476,7 @@
       $("error").hidden = true;
       show("sent");
       addMsg(text, true);
-      if (jwt && scanId) { loadThread(); pollTimer = setInterval(loadThread, 5000); }
+      if (jwt && scanId) { loadThread(); startPolling(); }
     })
     .catch(function(){
       btn.disabled = false; btn.textContent = "Send to the owner";
@@ -492,6 +494,19 @@
     $("thread").appendChild(d);
   }
 
+  var pollDelay = 5000;
+  function startPolling(){
+    if (pollTimer) return;
+    pollTimer = setTimeout(function tick(){
+      pollTimer = null;
+      if (document.hidden || !scanId) return;   // resumed by visibilitychange
+      loadThread(); startPolling();
+    }, pollDelay);
+  }
+  document.addEventListener("visibilitychange", function(){
+    if (!document.hidden && scanId && jwt) { pollDelay = 5000; loadThread(); startPolling(); }
+  });
+
   function loadThread(){
     if (!jwt || !scanId) return;
     fetch(API + "/rest/v1/messages?select=body,sender_type,created_at&scan_id=eq." +
@@ -504,14 +519,16 @@
         show("compose");
         return null;
       }
-      return r.ok ? r.json() : null;
+      if (!r.ok) { pollDelay = Math.min(pollDelay * 2, 60000); return null; }
+      pollDelay = 5000;
+      return r.json();
     })
     .then(function(rows){
       if (!rows || !rows.length) return;
       $("thread").innerHTML = "";
       rows.forEach(function(m){ addMsg(m.body, m.sender_type !== "owner"); });
     })
-    .catch(function(){ /* polling is a convenience; silence is correct here */ });
+    .catch(function(){ pollDelay = Math.min(pollDelay * 2, 60000); });
   }
 
   $("sendReply").addEventListener("click", function(){
@@ -522,9 +539,14 @@
       var row = rows && rows[0];
       if (!row || row.status !== "ok") throw new Error(row && row.status || "reply_failed");
       $("reply").value = ""; btn.disabled = false; btn.textContent = "Send another message";
+      $("error").hidden = true;
       addMsg(t, true); loadThread();
     })
-    .catch(function(){ btn.disabled = false; btn.textContent = "Send another message"; });
+    .catch(function(e){
+      btn.disabled = false; btn.textContent = "Send another message";
+      if (e && e.message === "rate_limited") return fail("That's a lot of messages in a short time. Please wait a little and try again.");
+      fail("Your reply didn't send. Please check your connection and try again.");
+    });
   });
 
   token = readToken();

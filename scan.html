@@ -3,16 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src https://bblutagmgsyybofkfzuf.supabase.co; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://bblutagmgsyybofkfzuf.supabase.co; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#523632">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Scan To Move">
 <meta property="og:description" content="Send the owner a message. Your number stays private.">
-<meta property="og:image" content="https://itsanasmaqsood.github.io/scan2move-web/og.png">
+<meta property="og:image" content="https://scan2move-web.vercel.app/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<title>Scan To Move</title>
+<title>scan2move · Message the owner</title>
 <!--
   The stranger-facing scan page.
 
@@ -36,152 +38,79 @@
   conversation would be one-way and the stranger would never know they had been
   answered.
 -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="brand.css">
 <style>
-  :root{
-    --canvas:#F6F8FC; --ink:#0F1729; --ink-muted:#5A6478; --ink-faint:#9AA3B4;
-    --mint:#00C48C; --mint-deep:#00996E; --mint-soft:#D6F8EC;
-    --iris:#5B5BD6; --iris-soft:#E6E4FF;
-    --coral:#FF6B5A; --coral-soft:#FFE2DE;
-    --surface:rgba(255,255,255,.82); --line:rgba(15,23,41,.08);
-    --radius:22px;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;padding:0}
-  body{
-    background:var(--canvas); color:var(--ink);
-    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    min-height:100dvh; display:flex; flex-direction:column; align-items:center;
-    padding:24px 16px 40px; position:relative; overflow-x:hidden;
-  }
-  /* The same living canvas as the app, so the two feel like one product. */
-  .aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
-  .blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
-  .b1{width:300px;height:300px;background:#7FF3C8;top:-90px;left:-70px}
-  .b2{width:280px;height:280px;background:#B9A8FF;top:18%;right:-110px;opacity:.5}
-  .b3{width:260px;height:260px;background:#9BD9FF;bottom:16%;left:-90px;opacity:.42}
-  .b4{width:240px;height:240px;background:#FFC9A8;bottom:-70px;right:-60px;opacity:.4}
-  @media (prefers-reduced-motion:no-preference){
-    .b1{animation:d1 26s ease-in-out infinite}
-    .b2{animation:d2 31s ease-in-out infinite}
-    .b3{animation:d1 36s ease-in-out infinite reverse}
-  }
-  @keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,18px)}}
-  @keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-22px,24px)}}
+  /* Same "Stuck On" look as the app. Every id the script uses is unchanged. */
+  body{min-height:100dvh;display:flex;flex-direction:column;align-items:center;padding:20px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+  .wrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:14px}
+  .brand{display:flex;justify-content:center;padding:4px 0 6px}
+  .brand img{height:28px;width:auto;display:block}
 
-  .wrap{width:100%;max-width:440px;display:flex;flex-direction:column;gap:16px}
-  .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:4px}
-  .brand svg{display:block}
-  .brand b{font-size:17px;font-weight:700;letter-spacing:-.01em}
+  .card{background:var(--white);border-radius:24px;padding:20px}
+  h1{font-family:var(--display);font-weight:800;font-size:28px;line-height:1.1;letter-spacing:-.025em;margin:0 0 8px;text-wrap:balance}
+  .sub{color:var(--mut);margin:0;font-size:15px}
 
-  .card{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-    padding:22px; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
-    box-shadow:0 10px 30px rgba(15,23,41,.06);
-  }
-  h1{font-size:26px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em}
-  .sub{color:var(--ink-muted);margin:0;font-size:15px}
+  .hero{background:var(--cocoa);color:var(--cream);border-radius:26px;padding:20px;text-align:center;position:relative;overflow:hidden}
+  .hero .you{font-size:13px;opacity:.85}
+  .vname{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.02em;line-height:1.1;margin-top:6px;word-break:break-word}
+  .vname span{display:inline-block;background:var(--pink);color:var(--white);border-radius:12px;padding:0 .3em;transform:rotate(-3deg)}
+  .vtype{font-size:13px;opacity:.85;text-transform:capitalize;margin-top:6px}
+  .promise{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;background:rgba(246,238,232,.12);border-radius:16px;color:var(--cream);font-size:13.5px;line-height:1.45;text-align:left}
+  .promise b{color:var(--white)}
 
-  .vehicle{display:flex;align-items:center;gap:14px;margin-top:4px}
-  .vicon{
-    width:52px;height:52px;border-radius:16px;background:var(--mint-soft);
-    display:grid;place-items:center;flex:0 0 auto
-  }
-  .vname{font-size:19px;font-weight:700;letter-spacing:-.01em}
-  .vtype{color:var(--ink-muted);font-size:14px;text-transform:capitalize}
+  .label{font:800 12px var(--body);letter-spacing:.1em;color:var(--mut);margin:2px 0 10px}
+  .reasons{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .reason{display:flex;align-items:center;gap:9px;padding:13px 12px;border-radius:16px;border:0;background:var(--sunk);cursor:pointer;text-align:left;font:700 14px var(--body);color:var(--ink);transition:transform .1s,background .15s,box-shadow .15s}
+  .reason .emo{font-size:20px;line-height:1}
+  .reason:active{transform:scale(.97)}
+  .reason[aria-pressed="true"]{background:#fdf0ec;box-shadow:inset 0 0 0 2px var(--red);color:var(--red)}
 
-  .promise{
-    display:flex;gap:10px;align-items:flex-start;margin-top:18px;padding:13px 14px;
-    background:var(--mint-soft);border-radius:14px;color:#00563E;font-size:13.5px;line-height:1.45
-  }
-  .promise svg{flex:0 0 auto;margin-top:1px}
+  textarea{width:100%;min-height:92px;resize:vertical;padding:14px 16px;border-radius:16px;border:2px solid transparent;background:var(--sunk);font:500 16px var(--body);color:var(--ink)}
+  textarea:focus{outline:none;border-color:var(--cocoa);background:var(--white)}
+  .count{font-size:12px;color:var(--mut-2);text-align:right;margin-top:6px}
 
-  .label{font-size:13px;font-weight:700;color:var(--ink-muted);margin:4px 0 10px;letter-spacing:.01em}
-  .reasons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .reason{
-    display:flex;flex-direction:column;align-items:flex-start;gap:7px;
-    padding:14px 13px;border-radius:16px;border:1.5px solid var(--line);
-    background:rgba(255,255,255,.7);cursor:pointer;text-align:left;
-    font:inherit;font-size:14px;font-weight:600;color:var(--ink);
-    transition:border-color .15s,background .15s,transform .1s
-  }
-  .reason .emo{font-size:21px;line-height:1}
-  .reason:active{transform:scale(.98)}
-  .reason[aria-pressed="true"]{border-color:var(--mint);background:var(--mint-soft)}
-
-  textarea{
-    width:100%;min-height:92px;resize:vertical;padding:13px 14px;border-radius:14px;
-    border:1.5px solid var(--line);background:rgba(255,255,255,.75);
-    font:inherit;font-size:15px;color:var(--ink)
-  }
-  textarea:focus{outline:2px solid var(--mint);outline-offset:2px;border-color:var(--mint)}
-  button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
-  .count{font-size:12px;color:var(--ink-faint);text-align:right;margin-top:6px}
-
-  button.primary{
-    width:100%;padding:17px;border:0;border-radius:999px;background:var(--mint);
-    color:#002014;font:inherit;font-size:16.5px;font-weight:700;cursor:pointer;
-    box-shadow:0 6px 18px rgba(0,196,140,.3);transition:transform .1s,opacity .15s
-  }
+  button.primary{width:100%;height:56px;border:0;border-radius:28px;background:var(--red);color:var(--white);font:800 16.5px var(--body);cursor:pointer;box-shadow:0 12px 24px -12px var(--red);transition:transform .1s,opacity .15s}
   button.primary:active{transform:scale(.985)}
-  button.primary:disabled{opacity:.5;cursor:default;box-shadow:none}
-  button.ghost{
-    width:100%;padding:14px;border:1.5px solid var(--line);border-radius:999px;
-    background:transparent;font:inherit;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer
-  }
+  button.primary:disabled{opacity:.45;cursor:default;box-shadow:none}
+  button.ghost{width:100%;height:50px;border:0;border-radius:26px;background:var(--cocoa);font:700 15px var(--body);color:var(--white);cursor:pointer}
+  button.ghost:disabled{opacity:.5}
 
-  .err{background:var(--coral-soft);color:#8A2317;padding:13px 14px;border-radius:14px;font-size:14.5px}
-  .lost{display:flex;gap:10px;align-items:flex-start;padding:14px;border-radius:14px;background:var(--coral-soft);color:#8A2317;font-size:14px;line-height:1.5;margin-bottom:18px}
+  .err{background:#fbe1dc;color:#8A2317;padding:14px 16px;border-radius:16px;font-size:14.5px}
+  .lost{display:flex;gap:10px;align-items:flex-start;padding:14px;border-radius:16px;background:#fdf0ec;box-shadow:inset 0 0 0 2px var(--red);color:#8A2317;font-size:14px;line-height:1.5;margin-bottom:16px}
   .lost svg{flex:0 0 auto;margin-top:2px}
   .lost b{display:block;margin-bottom:3px}
   .center{text-align:center}
-  .muted{color:var(--ink-muted);font-size:14px}
-  .foot{color:var(--ink-faint);font-size:12px;text-align:center;margin-top:6px}
-  [hidden]{display:none !important}
+  .muted{color:var(--mut);font-size:14px}
+  .foot{color:var(--mut-2);font-size:12px;text-align:center;margin-top:6px}
 
-  /* Sent confirmation: rings leaving the tick, the same idea as the app splash. */
-  .done{display:grid;place-items:center;padding:12px 0 4px}
-  .ring{
-    position:absolute;border:2px solid var(--mint);border-radius:50%;
-    width:74px;height:74px;opacity:0
-  }
+  .ringwrap{position:relative;display:grid;place-items:center;height:120px}
+  .ring{position:absolute;border:2px dashed var(--lime);border-radius:50%;width:84px;height:84px;opacity:0}
   @media (prefers-reduced-motion:no-preference){
     .ring{animation:pulse 2.6s ease-out infinite}
-    .ring:nth-child(2){animation-delay:.6s}
-    .ring:nth-child(3){animation-delay:1.2s}
+    .ring:nth-child(2){animation-delay:.8s}
+    .ring:nth-child(3){animation-delay:1.6s}
+    .tick{animation:pop .6s cubic-bezier(.2,.9,.3,1.4) both}
   }
-  @keyframes pulse{0%{transform:scale(.8);opacity:.75}100%{transform:scale(2.5);opacity:0}}
-  .tick{
-    position:relative;width:74px;height:74px;border-radius:50%;background:var(--mint);
-    display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,196,140,.35)
-  }
-  .ringwrap{position:relative;display:grid;place-items:center;height:110px}
+  @keyframes pulse{0%{transform:scale(.85);opacity:.8}100%{transform:scale(1.9);opacity:0}}
+  @keyframes pop{0%{transform:scale(.4)}100%{transform:scale(1)}}
+  .tick{position:relative;width:84px;height:84px;border-radius:50%;background:var(--lime);display:grid;place-items:center}
+  .sent-h span{display:inline-block;background:var(--pink);color:var(--white);border-radius:12px;padding:0 .3em;transform:rotate(-3deg)}
 
   .thread{display:flex;flex-direction:column;gap:10px;margin-top:4px}
-  .msg{padding:12px 14px;border-radius:16px;font-size:15px;max-width:86%;line-height:1.45}
-  .mine{background:var(--iris-soft);align-self:flex-end;border-bottom-right-radius:6px}
-  .theirs{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:6px}
-  .who{font-size:11.5px;font-weight:700;color:var(--ink-faint);margin-bottom:3px;letter-spacing:.02em}
+  .msg{padding:12px 15px;font-size:15px;max-width:86%;line-height:1.45}
+  .mine{background:var(--cocoa);color:var(--white);align-self:flex-end;border-radius:18px 18px 6px 18px}
+  .theirs{background:var(--sunk);align-self:flex-start;border-radius:18px 18px 18px 6px}
+  .who{font-size:11px;font-weight:800;opacity:.7;margin-bottom:3px;letter-spacing:.06em}
 </style>
 </head>
 <body>
 <script>if(window.top!==window.self){try{window.top.location=window.self.location.href;}catch(e){document.documentElement.style.display='none';}}</script>
 
-<div class="aurora">
-  <div class="blob b1"></div><div class="blob b2"></div>
-  <div class="blob b3"></div><div class="blob b4"></div>
-</div>
-
 <div class="wrap">
 
-  <div class="brand">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="2" y="2" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
-      <rect x="14" y="2" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
-      <rect x="2" y="14" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
-      <rect x="15.5" y="15.5" width="5" height="5" rx="1.6" fill="#00C48C"/>
-    </svg>
-    <b>Scan To Move</b>
-  </div>
+  <div class="brand"><img src="assets/logo.svg" alt="scan2move" width="166" height="28"></div>
 
   <!-- Loading -->
   <div class="card center" id="loading">
@@ -197,25 +126,14 @@
 
   <!-- Compose -->
   <div id="compose" hidden>
-    <div class="card">
-      <div class="vehicle">
-        <div class="vicon" aria-hidden="true">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-            <path d="M5 11l1.5-4.2A2 2 0 018.4 5.5h7.2a2 2 0 011.9 1.3L19 11m-14 0h14m-14 0v5.5m14-5.5v5.5M6.5 16.5h11M6.5 16.5v1.6a.9.9 0 01-.9.9H5a.9.9 0 01-.9-.9V16.5m13.4 0v1.6a.9.9 0 00.9.9h.6a.9.9 0 00.9-.9V16.5"
-              stroke="#00996E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="7.6" cy="13.6" r="1" fill="#00996E"/><circle cx="16.4" cy="13.6" r="1" fill="#00996E"/>
-          </svg>
-        </div>
-        <div>
-          <div class="vname" id="vname">This vehicle</div>
-          <div class="vtype" id="vtype"></div>
-        </div>
-      </div>
-
+    <div class="hero">
+      <div class="you">You scanned</div>
+      <div class="vname" id="vname">This vehicle</div>
+      <div class="vtype" id="vtype"></div>
       <div class="promise">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 3l7 3v5.5c0 4.3-3 7.6-7 9-4-1.4-7-4.7-7-9V6l7-3z" stroke="#00563E" stroke-width="1.8" stroke-linejoin="round"/>
-          <circle cx="9" cy="12" r="1" fill="#00563E"/><circle cx="12" cy="12" r="1" fill="#00563E"/><circle cx="15" cy="12" r="1" fill="#00563E"/>
+          <path d="M12 3l7 3v5.5c0 4.3-3 7.6-7 9-4-1.4-7-4.7-7-9V6l7-3z" stroke="#F6EEE8" stroke-width="1.8" stroke-linejoin="round"/>
+          <circle cx="9" cy="12" r="1" fill="#F6EEE8"/><circle cx="12" cy="12" r="1" fill="#F6EEE8"/><circle cx="15" cy="12" r="1" fill="#F6EEE8"/>
         </svg>
         <div><b>Nobody's number is shown here.</b> You won't see the owner's phone number, and they won't see yours. Your message reaches them straight away.</div>
       </div>
@@ -264,11 +182,11 @@
         <div class="ring"></div><div class="ring"></div><div class="ring"></div>
         <div class="tick">
           <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#002014" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
       </div>
-      <h1 style="margin-top:4px">The owner has been told</h1>
+      <h1 class="sent-h" style="margin-top:4px">Sent! The owner got a <span>ping</span></h1>
       <p class="sub">It has gone to their phone. You can stay on this page to see their reply.</p>
     </div>
 
@@ -283,7 +201,7 @@
 
   <div class="card err" id="error" role="alert" aria-live="assertive" hidden></div>
 
-  <p class="foot">Scan To Move — your number stays private.</p>
+  <p class="foot">scan2move · your number stays private · <a href="home.html" style="color:inherit">get your own sticker</a></p>
 </div>
 
 <script>

@@ -3,75 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#523632">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Scan To Move">
+<meta property="og:title" content="scan2move">
 <meta property="og:description" content="Reach a vehicle owner without seeing their phone number.">
-<meta property="og:image" content="https://itsanasmaqsood.github.io/scan2move-web/og.png">
+<meta property="og:image" content="https://scan2move-web.vercel.app/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<title>Scan To Move</title>
+<title>scan2move</title>
 <!--
-  Deliberately not a marketing site.
-
-  This repository exists to serve three things that must be on the open web and
-  cannot be served from Supabase Storage, which forcibly downgrades HTML to
-  text/plain (verified: identical bytes served as text/css render as CSS, as
-  text/html they are served as text/plain with nosniff). That restriction is why
-  the privacy policy and terms silently showed raw source for weeks.
-
-  What lives here: the public scan page a stranger lands on, and the legal pages
-  Google Play requires. Nothing else. No customer data is served from here and
-  no analytics are loaded.
+  Landing spot for a bare or broken scan link. The real pages are home.html
+  (about + ordering), scan.html (what a stranger sees) and the legal pages
+  Google Play requires. No customer data is served from here, no analytics.
 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="brand.css">
 <style>
-  :root{--canvas:#F6F8FC;--ink:#0F1729;--muted:#5A6478;--mint:#00C48C;--mint-deep:#00996E;--line:rgba(15,23,41,.08)}
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--canvas);color:var(--ink);min-height:100dvh;
-    display:flex;align-items:center;justify-content:center;padding:28px 18px;
-    font:400 16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-  .wrap{max-width:430px;width:100%;text-align:center}
-  .mark{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:22px}
-  h1{font-size:30px;letter-spacing:-.02em;margin:0 0 10px}
-  p{color:var(--muted);margin:0 0 10px}
-  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:24px;text-align:left}
-  .card b{display:block;margin-bottom:8px}
-  a{color:var(--mint-deep);font-weight:600}
-  ul{margin:10px 0 0;padding-left:18px;color:var(--muted)}
-  li{margin:6px 0}
-  .foot{color:#9AA3B4;font-size:12.5px;margin-top:26px}
+  body{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:28px max(18px,env(safe-area-inset-right,0px)) 28px max(18px,env(safe-area-inset-left,0px))}
+  .wrap{max-width:440px;width:100%;text-align:center;display:flex;flex-direction:column;gap:16px}
+  .mark{width:86px;margin:0 auto;animation:bob 3.5s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-6px)}}
+  .logo{height:30px;margin:0 auto}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,8vw,40px);line-height:1.1;letter-spacing:-.025em;text-wrap:balance;margin-top:6px}
+  p{color:var(--mut)}
+  .card{background:var(--white);border-radius:24px;padding:20px;text-align:left}
+  .card b{display:block;margin-bottom:6px;font-family:var(--display);font-size:18px}
+  .card p{margin:0}
+  .links{display:grid;gap:8px;margin-top:4px}
+  .links a{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:var(--sunk);text-decoration:none;font-weight:700;color:var(--ink)}
+  .links a:hover{background:var(--soft)}
+  .foot{font-size:13px;color:var(--mut-2)}
 </style>
 </head>
 <body>
 <script>if(window.top!==window.self){try{window.top.location=window.self.location.href;}catch(e){document.documentElement.style.display='none';}}</script>
   <div class="wrap">
-    <div class="mark">
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="2" y="2" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
-        <rect x="14" y="2" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
-        <rect x="2" y="14" width="8" height="8" rx="2.4" stroke="#00996E" stroke-width="2.2"/>
-        <rect x="15.5" y="15.5" width="5" height="5" rx="1.6" fill="#00C48C"/>
-      </svg>
-      <strong style="font-size:18px">Scan To Move</strong>
-    </div>
-
-    <h1>Stay reachable.<br>Keep your number private.</h1>
-    <p>A QR tag on your vehicle. Someone scans it and messages you — and neither of you ever sees the other's phone number.</p>
+    <img class="mark" src="assets/mark.svg" alt="" width="86" height="107">
+    <img class="logo" src="assets/wordmark.svg" alt="scan2move" width="160" height="24" style="height:24px">
+    <h1>Stay <span class="stk lime">reachable</span>.<br>Keep your number <span class="stk pink tilt-r">private</span>.</h1>
+    <p>A QR sticker on your vehicle. Someone scans it and messages you, and neither of you ever sees the other's phone number.</p>
 
     <div class="card">
-      <b>Scanned a tag and landed here?</b>
-      <p style="margin:0">The link you followed is missing its code. Please scan the tag again with your phone's camera, or ask the person who shared it to resend the link.</p>
+      <b>Scanned a sticker and landed here?</b>
+      <p>The link you followed is missing its code. Please scan the sticker again with your phone's camera, or ask the person who shared it to send the link again.</p>
     </div>
 
     <div class="card">
-      <b>Legal</b>
-      <ul>
-        <li><a href="home.html">About Scan To Move and ordering a sticker</a></li>
-        <li><a href="privacy.html">Privacy policy</a></li>
-        <li><a href="terms.html">Terms of service</a></li>
-        <li><a href="delete-account.html">Delete your account and data</a></li>
-      </ul>
+      <b>More</b>
+      <div class="links">
+        <a href="home.html">About scan2move and getting a sticker <span>→</span></a>
+        <a href="privacy.html">Privacy policy <span>→</span></a>
+        <a href="terms.html">Terms of service <span>→</span></a>
+        <a href="delete-account.html">Delete your account and data <span>→</span></a>
+      </div>
     </div>
 
     <p class="foot">Questions: anas.official2017@gmail.com</p>

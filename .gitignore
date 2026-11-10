@@ -3,3 +3,5 @@
 .env*
 
 .playwright-mcp/
+
+.vercel

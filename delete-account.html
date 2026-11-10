@@ -3,35 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<title>Delete your account — Scan To Move</title>
-<style>
-:root { color-scheme: light dark; --fg:#1a1a1a; --bg:#fff; --muted:#666; --line:#e3e3e3; --accent:#00996E; }
-@media (prefers-color-scheme: dark) {
-  :root { --fg:#e8e8e8; --bg:#121212; --muted:#9a9a9a; --line:#2c2c2c; --accent:#00C48C; }
-}
-* { box-sizing: border-box; }
-body { margin:0; padding:32px 20px 64px; background:var(--bg); color:var(--fg);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
-main { max-width: 760px; margin: 0 auto; }
-h1 { font-size:1.9rem; line-height:1.25; margin:0 0 8px; }
-h2 { font-size:1.25rem; margin:36px 0 10px; }
-h3 { font-size:1.05rem; margin:24px 0 8px; }
-p, li { color:var(--fg); }
-a { color:var(--accent); }
-code { background:rgba(127,127,127,.15); padding:1px 5px; border-radius:4px; font-size:.9em; }
-hr { border:0; border-top:1px solid var(--line); margin:32px 0; }
-table { border-collapse:collapse; width:100%; margin:16px 0; display:block; overflow-x:auto; }
-th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; font-size:.94rem; }
-th { background:rgba(127,127,127,.09); }
-footer { margin-top:48px; padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem; }
-</style>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#523632">
+<title>Delete your account · scan2move</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="brand.css">
 </head>
 <body>
 <script>if(window.top!==window.self){try{window.top.location=window.self.location.href;}catch(e){document.documentElement.style.display='none';}}</script>
-<main>
+<header class="topbar"><a href="home.html" aria-label="scan2move home"><img class="logo" src="assets/logo.svg" alt="scan2move" width="178" height="30"></a><a class="back" href="home.html">← Home</a></header>
+<main class="doc"><div class="paper">
 <h1>Delete your Scan To Move account</h1>
 <p><strong>App:</strong> Scan To Move (<code>com.apexmart.scan2move</code>)</p>
 <p>You can delete your account and all of its data at any time. There are two ways.</p>
@@ -57,7 +41,7 @@ footer { margin-top:48px; padding-top:16px; border-top:1px solid var(--line); co
 <p>Nothing else is retained. There is no archive, no backup copy of your account, and no "deactivated" state you can be restored from. Deletion cannot be undone.</p>
 <h2>This is a real deletion</h2>
 <p>The in-app button calls a server function that removes your profile — which cascades to your tags, scans, messages and notifications — and then deletes the login record itself. It is not a sign-out and not a hidden flag.</p>
-<footer>Scan To Move · Questions: <a href="mailto:anas.official2017@gmail.com">anas.official2017@gmail.com</a></footer>
-</main>
+<footer>scan2move · Questions: <a href="mailto:anas.official2017@gmail.com">anas.official2017@gmail.com</a></footer>
+</div></main>
 </body>
 </html>

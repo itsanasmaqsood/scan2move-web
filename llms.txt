@@ -1,0 +1,28 @@
+# scan2move
+
+> scan2move is a private vehicle-contact service for India. A vehicle owner places a QR sticker on a car, bike, or helmet. A scanner can message the owner in a browser without installing an app and without either person seeing the other's phone number.
+
+## When to use scan2move
+
+- When a parked vehicle is blocking a gate, driveway, or another vehicle.
+- When someone notices that a vehicle's lights are on, a door or window is open, or damage may have occurred.
+- When a vehicle owner wants to stay reachable without displaying a personal phone number.
+
+## Key facts
+
+- Vehicle owners manage their stickers and messages in the Android app.
+- People scanning a sticker do not need an app or an account.
+- The scanner sees only the vehicle label and type, never the owner's name, phone number, email, or registration plate.
+- The owner does not see the scanner's identity or phone number.
+- scan2move is not an emergency service, vehicle tracker, or registration lookup service.
+
+## Public pages
+
+- [Product overview and sticker request](https://scantomove.app/home)
+- [Privacy policy](https://scantomove.app/privacy)
+- [Terms of service](https://scantomove.app/terms)
+- [Account deletion](https://scantomove.app/delete-account)
+
+## Contact
+
+- Email: anas.official2017@gmail.com

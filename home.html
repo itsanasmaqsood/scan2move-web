@@ -11,13 +11,56 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#523632">
 <meta name="description" content="scan2move: a QR sticker for your vehicle that lets anyone reach you the moment it's in the way, without ever showing your phone number.">
+<link rel="canonical" href="https://scantomove.app/home">
 <meta property="og:type" content="website">
-<meta property="og:title" content="scan2move · your vehicle can speak for you">
+<meta property="og:title" content="Private QR Sticker for Cars &amp; Bikes | scan2move">
 <meta property="og:description" content="A QR sticker that lets anyone reach you about your vehicle without seeing your phone number.">
 <meta property="og:image" content="https://scantomove.app/og.png">
 <meta property="og:url" content="https://scantomove.app/home">
 <meta name="twitter:card" content="summary_large_image">
-<title>scan2move · Park and stay reachable</title>
+<title>Private QR Sticker for Cars &amp; Bikes | scan2move</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://scantomove.app/#organization",
+      "name": "Scan To Move",
+      "alternateName": "scan2move",
+      "url": "https://scantomove.app/home",
+      "logo": "https://scantomove.app/og.png",
+      "email": "anas.official2017@gmail.com",
+      "knowsAbout": [
+        "vehicle QR stickers",
+        "private vehicle owner messaging",
+        "parking alerts"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://scantomove.app/#website",
+      "name": "scan2move",
+      "alternateName": "Scan To Move",
+      "url": "https://scantomove.app/",
+      "publisher": { "@id": "https://scantomove.app/#organization" },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://scantomove.app/#app",
+      "name": "Scan To Move",
+      "alternateName": "scan2move",
+      "url": "https://scantomove.app/home",
+      "description": "A QR sticker and Android app that lets someone message a vehicle owner without either person seeing the other's phone number.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Android",
+      "keywords": "vehicle QR sticker, private parking alerts, contact vehicle owner",
+      "publisher": { "@id": "https://scantomove.app/#organization" }
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Caveat:wght@700&family=Fraunces:ital,wght@1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
@@ -63,7 +106,7 @@
   .urgent b{font-size:14px;line-height:1.35}
   .urgent span.rb{background:var(--white);color:var(--red);border-radius:20px;height:38px;display:grid;place-items:center;font-weight:800;font-size:13px}
   .wk{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-  .wk div{background:var(--white);border-radius:14px;padding:7px 0;text-align:center;font-size:9.5px;color:var(--mut-2);display:flex;flex-direction:column;align-items:center;gap:3px}
+  .wk div{background:var(--white);border-radius:14px;padding:7px 0;text-align:center;font-size:9.5px;color:var(--ink-2);display:flex;flex-direction:column;align-items:center;gap:3px}
   .wk b{font-size:12px;color:var(--ink)}
   .wk i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:10px}
   .wk .today{box-shadow:inset 0 0 0 2px var(--ink)}
@@ -75,8 +118,8 @@
   .pnav .ic span.on{background:var(--soft)}
   .fab{width:54px;height:54px;border-radius:50%;background:var(--cocoa);color:var(--white);display:grid;place-items:center;font-size:24px}
   .float-stk{position:absolute;z-index:2;font:800 15px var(--body);padding:6px 14px;border-radius:12px;color:var(--white);box-shadow:0 12px 22px -12px rgba(0,0,0,.4);animation:bob 4s ease-in-out infinite}
-  .fs1{top:40px;left:0;background:var(--pink);transform:rotate(-6deg)}
-  .fs2{bottom:70px;right:0;background:var(--lime);transform:rotate(5deg);animation-delay:1.4s}
+  .fs1{top:40px;left:0;background:var(--pink);color:var(--ink);transform:rotate(-6deg)}
+  .fs2{bottom:70px;right:0;background:var(--lime);color:var(--ink);transform:rotate(5deg);animation-delay:1.4s}
   .fs3{top:46%;left:-6px;background:var(--sun);color:var(--ink);transform:rotate(4deg);animation-delay:2.4s}
   @keyframes float{50%{transform:translateY(-10px)}}
   @keyframes bob{50%{translate:0 -8px}}
@@ -233,11 +276,11 @@
       <p>Every sticker carries your own QR code and never your number, name or plate. Download a free PDF in the app, or we print and deliver.</p>
     </div>
     <div class="stickers">
-      <div><div class="st" style="background:var(--cocoa);color:var(--white)"><img src="assets/logo-dark.svg" alt="" style="height:16px;align-self:flex-start"><div class="q"><svg viewBox="0 0 21 21" shape-rendering="crispEdges"><use href="#qr"/></svg></div><div style="text-align:center"><b>Blocking? Scan to reach me</b><br><small>No app needed · number stays hidden</small></div></div><div class="stname">CLASSIC COCOA</div></div>
+      <div><div class="st" style="background:var(--cocoa);color:var(--white)"><img src="assets/logo-dark.svg" alt="" width="95" height="16" style="height:16px;align-self:flex-start"><div class="q"><svg viewBox="0 0 21 21" shape-rendering="crispEdges"><use href="#qr"/></svg></div><div style="text-align:center"><b>Blocking? Scan to reach me</b><br><small>No app needed · number stays hidden</small></div></div><div class="stname">CLASSIC COCOA</div></div>
       <div><div class="st" style="background:var(--pink);transform:rotate(-3deg)"><span class="stk cocoa" style="font:800 12px var(--body);padding:4px 10px;align-self:flex-start">SCAN ME 👋</span><div class="q"><svg viewBox="0 0 21 21" shape-rendering="crispEdges"><use href="#qr"/></svg></div><b>Need me to move? <span class="hand" style="font-size:20px">just scan!</span></b></div><div class="stname">PINK TILT</div></div>
       <div><div class="st" style="background:var(--lime);color:var(--white)"><b style="font-size:21px">गाड़ी हटवानी है?</b><div class="q"><svg viewBox="0 0 21 21" shape-rendering="crispEdges"><use href="#qr"/></svg></div><b style="font-size:14px">स्कैन करो, मालिक को मैसेज करो</b></div><div class="stname">DESI · IN YOUR LANGUAGE</div></div>
       <div><div class="st" style="background:#141010;color:var(--white);box-shadow:inset 0 0 0 3px var(--sun),var(--shadow)"><small style="color:var(--sun);align-self:flex-end">✦ GLOWS AT NIGHT</small><div class="q" style="box-shadow:0 0 22px rgba(242,178,51,.5)"><svg viewBox="0 0 21 21" shape-rendering="crispEdges"><use href="#qr"/></svg></div><b style="color:var(--sun)">Scan to reach the owner</b></div><div class="stname">NIGHT GLOW</div></div>
-      <div><div class="st" style="background:var(--white)"><img src="assets/logo.svg" alt="" style="height:14px"><div class="q" style="padding:0"><svg viewBox="0 0 21 21" shape-rendering="crispEdges"><use href="#qr"/></svg></div><b style="font-weight:700;font-size:15px">Scan to contact the owner</b></div><div class="stname">MINIMAL WHITE</div></div>
+      <div><div class="st" style="background:var(--white)"><img src="assets/logo.svg" alt="" width="83" height="14" style="height:14px"><div class="q" style="padding:0"><svg viewBox="0 0 21 21" shape-rendering="crispEdges"><use href="#qr"/></svg></div><b style="font-weight:700;font-size:15px">Scan to contact the owner</b></div><div class="stname">MINIMAL WHITE</div></div>
     </div>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="qr" fill="#231815"><path d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0z"/><path fill="#fff" d="M1 1h5v5H1zM15 1h5v5h-5zM1 15h5v5H1z"/><path d="M2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2zM8 0h2v2H8zM11 1h2v3h-2zM8 3h2v2H8zM9 6h3v2H9zM0 8h2v2H0zM3 8h3v1H3zM7 9h2v3H7zM10 9h1v2h-1zM12 8h2v2h-2zM15 8h2v1h-2zM18 8h3v2h-3zM1 11h2v2H1zM4 10h2v3H4zM12 11h3v1h-3zM16 10h2v3h-2zM19 11h2v2h-2zM8 13h3v2H8zM12 13h2v3h-2zM15 14h3v2h-3zM19 14h2v1h-2zM8 16h2v3H8zM11 17h3v1h-3zM15 17h2v2h-2zM18 17h3v2h-3zM11 19h3v2h-3zM16 20h4v1h-4z"/></g></defs></svg>
   </section>
@@ -306,9 +349,9 @@
     <div class="grid">
       <div><img class="logo" src="assets/logo-dark.svg" alt="scan2move" width="200" height="34"><p class="tl">A QR sticker that keeps your number to yourself, so your vehicle can speak for you.</p></div>
       <div class="cols">
-        <div><h4>Product</h4><a href="#how">How it works</a><a href="#stickers">Stickers</a><a href="#order">Get a sticker</a></div>
-        <div><h4>Legal</h4><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a><a href="delete-account.html">Delete your data</a></div>
-        <div><h4>Contact</h4><a href="mailto:anas.official2017@gmail.com">Email us</a></div>
+        <div><h3>Product</h3><a href="#how">How it works</a><a href="#stickers">Stickers</a><a href="#order">Get a sticker</a></div>
+        <div><h3>Legal</h3><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of service</a><a href="delete-account.html">Delete your data</a></div>
+        <div><h3>Contact</h3><a href="mailto:anas.official2017@gmail.com">Email us</a></div>
       </div>
     </div>
     <div class="base"><span>© 2026 scan2move. Made in India.</span><span>Your number stays private.</span></div>

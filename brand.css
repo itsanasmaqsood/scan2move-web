@@ -74,7 +74,7 @@ img{max-width:100%}
 .sitefoot .logo{height:34px;width:auto;display:block;margin-bottom:14px}
 .sitefoot .tl{max-width:34ch;color:#d9c7c0;font-size:15px}
 .sitefoot .cols{display:flex;gap:44px;flex-wrap:wrap}
-.sitefoot h4{font:800 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin-bottom:12px}
+.sitefoot h3{font:800 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--sun);margin-bottom:12px}
 .sitefoot .cols a{display:block;color:#ecdcd6;text-decoration:none;font-size:15px;padding:4px 0}
 .sitefoot .cols a:hover{color:var(--white)}
 .sitefoot .base{margin-top:40px;padding-top:20px;border-top:1px solid rgba(246,238,232,.16);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13.5px;color:#cbb8b1}
